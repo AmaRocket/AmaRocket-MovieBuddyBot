@@ -1,6 +1,11 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 # Byte-compiled / optimized / DLL files
 *__pycache__/
+=======
+# Byte-compiled / optimized / DLL files
+__pycache__/
+>>>>>>> 54ed981... Initial commit
 *.py[cod]
 *$py.class
 
@@ -128,6 +133,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+<<<<<<< HEAD
 
 .idea
 
@@ -202,3 +208,5 @@ tags
 *.sw[op]
 .vscode
 .idea
+=======
+>>>>>>> 54ed981... Initial commit
