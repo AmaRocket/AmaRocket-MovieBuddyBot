@@ -62,7 +62,7 @@ async def poppular_by(callback: types.CallbackQuery):
     text_value = f' Movie: {original_name}\n Release date: {release_date}\n Genre id: {genre_ids}\n' \
                  f' Original languare {original_language}\n Overwiew: {overview}\n Voteaverage: {vote_average}\n' \
                  f' Vote count: {vote_count}\n Popularity: {popularity}\n Genre id: {genre_ids}\n Movie_id: {id}\n' \
-                 f' Poster path: https://www.themoviedb.org/t/p/original{poster_path}\n' \
+                 f' Poster path: https://image.tmdb.org/t/p/w500{poster_path}\n' \
                  f'------------------------------------------------------------------------------------------'
     # For "typing" message in top console
     await bot.send_chat_action(callback.message.chat.id, ChatActions.TYPING)
@@ -99,35 +99,39 @@ async def find_by_title(message: types.Message, state: FSMContext):
 
 @dp.callback_query_handler(Text(startswith='find'), state=FormTitle.title)
 async def title(callback: types.CallbackQuery, state: FSMContext):
-    async with state.proxy() as data:
-        first = int(callback['data'].replace('find_', ''))
-        name = data['title']
-        movie_list = find_by_name(name)
-        print(movie_list)
+    try:
+        async with state.proxy() as data:
+            first = int(callback['data'].replace('find_', ''))
+            name = data['title']
+            movie_list = find_by_name(name)
+            print(movie_list)
 
-        id = movie_list[first]['id']
-        genre_ids = movie_list[first]['genre_ids']
-        original_name = movie_list[first]['original_title']
-        original_language = movie_list[first]['original_language']
-        overview = movie_list[first]['overview']
-        vote_average = movie_list[first]['vote_average']
-        vote_count = movie_list[first]['vote_count']
-        release_date = movie_list[first]['release_date']
-        popularity = movie_list[first]['popularity']
-        poster_path = movie_list[first]['poster_path']
+            id = movie_list[first]['id']
+            genre_ids = movie_list[first]['genre_ids']
+            original_name = movie_list[first]['original_title']
+            original_language = movie_list[first]['original_language']
+            overview = movie_list[first]['overview']
+            vote_average = movie_list[first]['vote_average']
+            vote_count = movie_list[first]['vote_count']
+            release_date = movie_list[first]['release_date']
+            popularity = movie_list[first]['popularity']
+            poster_path = movie_list[first]['poster_path']
 
-        text_value = f' Movie: {original_name}\n Release date: {release_date}\n Genre id: {genre_ids}\n' \
-                     f' Original languare {original_language}\n Overwiew: {overview}\n Voteaverage: {vote_average}\n' \
-                     f' Vote count: {vote_count}\n Popularity: {popularity}\n Genre id: {genre_ids}\n Movie_id: {id}\n' \
-                     f' Poster path: https://www.themoviedb.org/t/p/original{poster_path}\n' \
-                     f'-------------------------------------------------------------------------------------------------'
-        # For "typing" message in top console
-        await bot.send_chat_action(callback.message.chat.id, ChatActions.TYPING)
-        await asyncio.sleep(1)
+            text_value = f' Movie: {original_name}\n Release date: {release_date}\n Genre id: {genre_ids}\n' \
+                         f' Original languare {original_language}\n Overwiew: {overview}\n Voteaverage: {vote_average}\n' \
+                         f' Vote count: {vote_count}\n Popularity: {popularity}\n Genre id: {genre_ids}\n Movie_id: {id}\n' \
+                         f' Poster path: https://image.tmdb.org/t/p/w500{poster_path}\n' \
+                         f'-------------------------------------------------------------------------------------------------'
+            # For "typing" message in top console
+            await bot.send_chat_action(callback.message.chat.id, ChatActions.TYPING)
+            await asyncio.sleep(1)
 
-        await callback.message.edit_text(text=text_value)
-        await callback.message.edit_reply_markup(
-            reply_markup=title_movie_buttons(first, len(movie_list), original_name, id))
+            await callback.message.edit_text(text=text_value)
+            await callback.message.edit_reply_markup(
+                reply_markup=title_movie_buttons(first, len(movie_list), original_name, id))
+    except IndexError as ex:
+        await state.finish()
+        await callback.message.reply('Sorry. No Results', reply_markup=menu_())
 
 
 @dp.callback_query_handler(Text(startswith='finish'), state=FormTitle)
@@ -238,46 +242,51 @@ async def process_year(message: types.Message, state: FSMContext):
 
 @dp.callback_query_handler(Text(startswith='total'), state=FormCriteria.year)
 async def total(callback: types.CallbackQuery, state: FSMContext):
-    async with state.proxy() as data:
-        first = int(callback['data'].replace('total_', ''))
+    try:
+        async with state.proxy() as data:
+            first = int(callback['data'].replace('total_', ''))
 
-        genre = data['genre']
-        voteaverege = data['voteaverage']
-        year = data['year']
-        api_version = 3
-        api_base_url = f'https://api.themoviedb.org/{api_version}'
-        endpoint_path = f'/discover/movie'
-        endpoint = f'{api_base_url}{endpoint_path}?api_key={api_key}' \
-                   f'&sort_by=popularity.desc&include_adult=false&include_video=false&vote_count.gte=200' \
-                   f'&with_genres={genre}&vote_average.gte={voteaverege}&primary_release_year={year}'
+            genre = data['genre']
+            voteaverege = data['voteaverage']
+            year = data['year']
+            api_version = 3
+            api_base_url = f'https://api.themoviedb.org/{api_version}'
+            endpoint_path = f'/discover/movie'
+            endpoint = f'{api_base_url}{endpoint_path}?api_key={api_key}' \
+                       f'&sort_by=popularity.desc&include_adult=false&include_video=false&vote_count.gte=200' \
+                       f'&with_genres={genre}&vote_average.gte={voteaverege}&primary_release_year={year}'
 
-        r = requests.get(endpoint)
-        data = r.json()
-        print(len(data))
+            r = requests.get(endpoint)
+            data = r.json()
+            print(len(data))
 
-        id = data['results'][first]['id']
-        # genre_ids = data['results'][first]['genre_ids']
-        original_name = data['results'][first]['original_title']
-        original_language = data['results'][first]['original_language']
-        overview = data['results'][first]['overview']
-        vote_average = data['results'][first]['vote_average']
-        vote_count = data['results'][first]['vote_count']
-        release_date = data['results'][first]['release_date']
-        popularity = data['results'][first]['popularity']
-        poster_path = data['results'][first]['poster_path']
+            id = data['results'][first]['id']
+            # genre_ids = data['results'][first]['genre_ids']
+            original_name = data['results'][first]['original_title']
+            original_language = data['results'][first]['original_language']
+            overview = data['results'][first]['overview']
+            vote_average = data['results'][first]['vote_average']
+            vote_count = data['results'][first]['vote_count']
+            release_date = data['results'][first]['release_date']
+            popularity = data['results'][first]['popularity']
+            poster_path = data['results'][first]['poster_path']
 
-        text_value = f' Movie: {original_name}\n Release date: {release_date}\n ' \
-                     f' Original languare {original_language}\n Overwiew: {overview}\n Voteaverage: {vote_average}\n' \
-                     f' Vote count: {vote_count}\n Popularity: {popularity}\n Movie_id: {id}\n' \
-                     f' Poster path: https://www.themoviedb.org/t/p/original{poster_path}\n' \
-                     f'------------------------------------------------------------------------------------------'
+            text_value = f' Movie: {original_name}\n Release date: {release_date}\n ' \
+                         f' Original languare {original_language}\n Overwiew: {overview}\n Voteaverage: {vote_average}\n' \
+                         f' Vote count: {vote_count}\n Popularity: {popularity}\n Movie_id: {id}\n' \
+                         f' Poster path: https://image.tmdb.org/t/p/w500/{poster_path}\n' \
+                         f'------------------------------------------------------------------------------------------'
 
-        # For "typing" message in top console
-        await bot.send_chat_action(callback.message.chat.id, ChatActions.TYPING)
-        await asyncio.sleep(0.25)
+            # For "typing" message in top console
+            await bot.send_chat_action(callback.message.chat.id, ChatActions.TYPING)
+            await asyncio.sleep(0.25)
 
-        await callback.message.edit_text(text=text_value)
-        await callback.message.edit_reply_markup(reply_markup=result_keyboard(first, len(data), original_name, id))
+            await callback.message.edit_text(text=text_value)
+            await callback.message.edit_reply_markup(reply_markup=result_keyboard(first, len(data), original_name, id))
+    except IndexError as ex:
+        await state.finish()
+        await callback.message.reply('Sorry. No Results', reply_markup=menu_())
+
 
 
 @dp.callback_query_handler(Text(startswith='finish'), state=FormCriteria)
