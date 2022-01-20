@@ -1,0 +1,4 @@
+aiogram~=2.18
+requests~=2.26.0
+python-dotenv~=0.19.2
+tmdbv3api~=1.7.6
