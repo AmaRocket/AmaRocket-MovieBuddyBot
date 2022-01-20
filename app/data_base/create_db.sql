@@ -1,12 +1,17 @@
-create table users
+-- Table: public.users
+
+-- DROP TABLE IF EXISTS public.users;
+
+CREATE TABLE IF NOT EXISTS public.users
 (
-    id          serial,
-    username    text,
-    request     text,
-);
+    id integer NOT NULL,
+    username text COLLATE pg_catalog."default",
+    count_messages integer NOT NULL DEFAULT 0,
+    requests text COLLATE pg_catalog."default",
+    CONSTRAINT users_pkey PRIMARY KEY (id)
+)
 
-alter table users
-    owner to postgres;
+TABLESPACE pg_default;
 
-create unique index users_id_uindex
-    on users (id);
+ALTER TABLE IF EXISTS public.users
+    OWNER to flask_db;

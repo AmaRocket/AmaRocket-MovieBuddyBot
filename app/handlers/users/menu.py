@@ -8,7 +8,7 @@ from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import StatesGroup, State
 
 from TEST_TMDB_PIPY import popular_movie, find_by_name
-from config import api_key
+from config import api_key, DB_URI
 
 from keyboards.default import genres, vote_average
 from keyboards.inline.choise_buttons import popular_movie_buttons, menu_, title_movie_buttons, total_keyboard, \
@@ -20,6 +20,11 @@ from aiogram.dispatcher.filters import Command, Text
 
 import asyncio
 from aiogram.types import ChatActions
+
+import psycopg2
+
+db_connection = psycopg2.connect(DB_URI, sslmode='require')
+db_object = db_connection.cursor()
 
 
 class FormTitle(StatesGroup):
@@ -35,11 +40,21 @@ class FormCriteria(StatesGroup):
 # Work!
 @dp.message_handler(Command('start'))
 async def start_menu(message: Message):
+    id = message.from_user.id
+    username = message.from_user.username
+
     # For "typing" message in top console
     await bot.send_chat_action(message.chat.id, ChatActions.TYPING)
     await asyncio.sleep(1)
 
-    await message.reply('Select Your Option From Menu', reply_markup=menu_())
+    await message.reply(f'Hello {username}🖖🏻 \nSelect Your Option From Menu👇🏻', reply_markup=menu_())
+
+    db_object.execute(f'SELECT id FROM users WHERE id = {id}')
+    result = db_object.fetchone()
+
+    if not result:
+        db_object.execute('INSERT INTO users (id, username, count_messages) VALUES (%s, %s, %s)',(id, username, 0))
+        db_connection.commit()
 
 
 # List Of Popular Movies
