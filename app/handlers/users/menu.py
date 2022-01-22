@@ -4,7 +4,8 @@ import aiogram.utils.markdown as md
 
 from aiogram import types
 from aiogram.dispatcher import FSMContext
-from aiogram.dispatcher.filters.state import StatesGroup, State
+
+from states.criteria import FormCriteria
 
 from TEST_TMDB_PIPY import popular_movie, find_by_name, find_by_criteria
 from config import DB_URI
@@ -27,21 +28,10 @@ import psycopg2
 db_connection = psycopg2.connect(DB_URI, sslmode='require')
 db_object = db_connection.cursor()
 
+
 def update_messages_count(user_id):
     db_object.execute(f"UPDATE users SET count_messages = count_messages + 1 WHERE id = {user_id}")
     db_connection.commit()
-
-
-
-# =====================================================================================================================
-
-
-# ================ FINITE STATE MACHINE ===============================================================================
-class FormCriteria(StatesGroup):
-    title = State()
-    genre = State()
-    voteaverage = State()
-    year = State()
 
 
 # =====================================================================================================================
@@ -75,6 +65,7 @@ async def user_message(message):
     user_id = message.from_user.id
     update_messages_count(user_id)
 
+
 # =====================================================================================================================
 
 
@@ -89,11 +80,9 @@ async def movies(callback: types.CallbackQuery):
     await callback.message.reply('Choose The Option 👇', reply_markup=menu_())
 
 
-
 # List Of Popular Movies
 @dp.callback_query_handler(Text(startswith='popular'))
 async def poppular_by(callback: types.CallbackQuery):
-
     popular_list = popular_movie()
     first = int(callback['data'].replace('popular_', ''))
     # Message List
@@ -122,8 +111,6 @@ async def poppular_by(callback: types.CallbackQuery):
         reply_markup=popular_movie_buttons(first, len(popular_list), original_name, id))
 
 
-
-
 # Find Movie By Title
 @dp.callback_query_handler(Text(startswith='title'))
 async def choose_option(callback: types.CallbackQuery):
@@ -150,6 +137,7 @@ async def find_by_title(message: types.Message, state: FSMContext):
             reply_markup=title_keyboard()
         )
     update_messages_count(user_id)
+
 
 # Find Movie By Title
 @dp.callback_query_handler(Text(startswith='find'), state=FormCriteria.title)
