@@ -2,17 +2,16 @@ import logging
 
 import aiogram.utils.markdown as md
 
-import requests
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import StatesGroup, State
 
-from TEST_TMDB_PIPY import popular_movie, find_by_name
-from config import api_key, DB_URI
+from TEST_TMDB_PIPY import popular_movie, find_by_name, find_by_criteria
+from config import DB_URI
+from keyboards.default import vote_average
 
-from keyboards.default import genres, vote_average
 from keyboards.inline.choise_buttons import popular_movie_buttons, menu_, title_movie_buttons, total_keyboard, \
-    result_keyboard, title_keyboard
+    result_keyboard, title_keyboard, genres_keyboard, start
 from loader import dp, bot
 from aiogram.types import Message, ParseMode
 
@@ -23,49 +22,84 @@ from aiogram.types import ChatActions
 
 import psycopg2
 
+# ================ DATA BASE SETTINGS =================================================================================
+
 db_connection = psycopg2.connect(DB_URI, sslmode='require')
 db_object = db_connection.cursor()
 
+def update_messages_count(user_id):
+    db_object.execute(f"UPDATE users SET count_messages = count_messages + 1 WHERE id = {user_id}")
+    db_connection.commit()
 
-class FormTitle(StatesGroup):
-    title = State()
 
 
+# =====================================================================================================================
+
+
+# ================ FINITE STATE MACHINE ===============================================================================
 class FormCriteria(StatesGroup):
+    title = State()
     genre = State()
     voteaverage = State()
     year = State()
 
 
-# Work!
+# =====================================================================================================================
+
+
+# ================ START FUNCIONS + ADD USER TO DB ====================================================================
 @dp.message_handler(Command('start'))
 async def start_menu(message: Message):
-    id = message.from_user.id
-    username = message.from_user.username
+    user_id = message.from_user.id
+    username = message.from_user.first_name
 
     # For "typing" message in top console
     await bot.send_chat_action(message.chat.id, ChatActions.TYPING)
     await asyncio.sleep(1)
 
-    await message.reply(f'Hello {username}🖖🏻 \nSelect Your Option From Menu👇🏻', reply_markup=menu_())
+    await message.reply(f'Hello {username}. \nSelect Your Option From Menu 👇', reply_markup=start())
 
-    db_object.execute(f'SELECT id FROM users WHERE id = {id}')
+    # add users info in db
+    db_object.execute(f'SELECT id FROM users WHERE id = {user_id}')
     result = db_object.fetchone()
 
     if not result:
-        db_object.execute('INSERT INTO users (id, username, count_messages) VALUES (%s, %s, %s)',(id, username, 0))
+        db_object.execute('INSERT INTO users (id, username, count_messages) VALUES (%s, %s, %s)', (id, username, 0))
         db_connection.commit()
+
+    update_messages_count(user_id)
+
+
+@dp.message_handler(lambda message: True, content_types='text')
+async def user_message(message):
+    user_id = message.from_user.id
+    update_messages_count(user_id)
+
+# =====================================================================================================================
+
+
+# ================ MOVIES =============================================================================================
+
+@dp.callback_query_handler(Text(startswith='movies'))
+async def movies(callback: types.CallbackQuery):
+    # For "typing" message in top console
+    await bot.send_chat_action(callback.message.chat.id, ChatActions.TYPING)
+    await asyncio.sleep(1)
+
+    await callback.message.reply('Choose The Option 👇', reply_markup=menu_())
+
 
 
 # List Of Popular Movies
 @dp.callback_query_handler(Text(startswith='popular'))
 async def poppular_by(callback: types.CallbackQuery):
+
     popular_list = popular_movie()
     first = int(callback['data'].replace('popular_', ''))
     # Message List
     id = popular_list[first]['id']
     genre_ids = popular_list[first]['genre_ids']
-    original_name = popular_list[first]['original_title']
+    original_name = popular_list[first]['title']
     original_language = popular_list[first]['original_language']
     overview = popular_list[first]['overview']
     vote_average = popular_list[first]['vote_average']
@@ -77,7 +111,7 @@ async def poppular_by(callback: types.CallbackQuery):
     text_value = f' Movie: {original_name}\n Release date: {release_date}\n Genre id: {genre_ids}\n' \
                  f' Original languare {original_language}\n Overwiew: {overview}\n Voteaverage: {vote_average}\n' \
                  f' Vote count: {vote_count}\n Popularity: {popularity}\n Genre id: {genre_ids}\n Movie_id: {id}\n' \
-                 f' Poster path: https://image.tmdb.org/t/p/w500{poster_path}\n' \
+                 f' Poster path: https://image.tmdb.org/t/p/original{poster_path}\n' \
                  f'------------------------------------------------------------------------------------------'
     # For "typing" message in top console
     await bot.send_chat_action(callback.message.chat.id, ChatActions.TYPING)
@@ -88,17 +122,22 @@ async def poppular_by(callback: types.CallbackQuery):
         reply_markup=popular_movie_buttons(first, len(popular_list), original_name, id))
 
 
+
+
+# Find Movie By Title
 @dp.callback_query_handler(Text(startswith='title'))
 async def choose_option(callback: types.CallbackQuery):
     # For "typing" message in top console
     await bot.send_chat_action(callback.message.chat.id, ChatActions.TYPING)
     await asyncio.sleep(1)
-    await FormTitle.title.set()
+    await FormCriteria.title.set()
     await callback.message.answer('Enter Title Of Film:')
 
 
-@dp.message_handler(state=FormTitle.title)
+# Find Movie By Title
+@dp.message_handler(state=FormCriteria.title)
 async def find_by_title(message: types.Message, state: FSMContext):
+    user_id = message.from_user.id
     async with state.proxy() as data:
         data['title'] = message.text
         await bot.send_message(
@@ -107,23 +146,24 @@ async def find_by_title(message: types.Message, state: FSMContext):
                 md.text('Title is: ', md.bold(data['title'])),
                 sep='\n',
             ),
-            parse_mode=ParseMode.MARKDOWN,
+            parse_mode=ParseMode.MARKDOWN_V2,
             reply_markup=title_keyboard()
         )
+    update_messages_count(user_id)
 
-
-@dp.callback_query_handler(Text(startswith='find'), state=FormTitle.title)
+# Find Movie By Title
+@dp.callback_query_handler(Text(startswith='find'), state=FormCriteria.title)
 async def title(callback: types.CallbackQuery, state: FSMContext):
     try:
         async with state.proxy() as data:
             first = int(callback['data'].replace('find_', ''))
             name = data['title']
             movie_list = find_by_name(name)
-            print(movie_list)
+            # print(movie_list)
 
             id = movie_list[first]['id']
             genre_ids = movie_list[first]['genre_ids']
-            original_name = movie_list[first]['original_title']
+            original_name = movie_list[first]['title']
             original_language = movie_list[first]['original_language']
             overview = movie_list[first]['overview']
             vote_average = movie_list[first]['vote_average']
@@ -135,7 +175,7 @@ async def title(callback: types.CallbackQuery, state: FSMContext):
             text_value = f' Movie: {original_name}\n Release date: {release_date}\n Genre id: {genre_ids}\n' \
                          f' Original languare {original_language}\n Overwiew: {overview}\n Voteaverage: {vote_average}\n' \
                          f' Vote count: {vote_count}\n Popularity: {popularity}\n Genre id: {genre_ids}\n Movie_id: {id}\n' \
-                         f' Poster path: https://image.tmdb.org/t/p/w500{poster_path}\n' \
+                         f' Poster path: https://image.tmdb.org/t/p/original{poster_path}\n' \
                          f'-------------------------------------------------------------------------------------------------'
             # For "typing" message in top console
             await bot.send_chat_action(callback.message.chat.id, ChatActions.TYPING)
@@ -149,8 +189,9 @@ async def title(callback: types.CallbackQuery, state: FSMContext):
         await callback.message.reply('Sorry. No Results', reply_markup=menu_())
 
 
-@dp.callback_query_handler(Text(startswith='finish'), state=FormTitle)
+@dp.callback_query_handler(Text(startswith='finish'), state=FormCriteria)
 async def passing(callback: types.CallbackQuery, state: FSMContext):
+    await callback.message.reply('Select Your Option From Menu👇🏻', reply_markup=menu_())
     await callback.answer(text="Thnx For Using This Bot 🤖!")
     await state.finish()
 
@@ -172,37 +213,40 @@ async def cancel_handler(message: types.Message, state: FSMContext):
     await bot.send_chat_action(message.chat.id, ChatActions.TYPING)
     await asyncio.sleep(1)
 
-    # Cancel state and inFormCriteria user about it
+    # Cancel state and inform user about it
     await state.finish()
     # And remove keyboard (just in case)
     await message.reply('Cancelled.', reply_markup=types.ReplyKeyboardRemove())
 
+
+# =====================================================================================================================
 
 @dp.callback_query_handler(Text(startswith='criteria'))
 async def choose_option(callback: types.CallbackQuery):
     # For "typing" message in top console
     await bot.send_chat_action(callback.message.chat.id, ChatActions.TYPING)
     await asyncio.sleep(1)
+
     await FormCriteria.genre.set()
-    await callback.message.answer('Choose Genre:',
-                                  reply_markup=genres)
+    await callback.message.reply('Choose Genre:',
+                                 reply_markup=genres_keyboard())
 
 
-@dp.message_handler(state=FormCriteria.genre)
-async def process_genre(message: types.Message, state: FSMContext):
+@dp.callback_query_handler(state=FormCriteria.genre)
+async def process_genre(callback: types.CallbackQuery, state: FSMContext):
     """
     Process genre edit
     """
     async with state.proxy() as data:
-        data['genre'] = message.text
+        data['genre'] = callback.data
 
     # For "typing" message in top console
-    await bot.send_chat_action(message.chat.id, ChatActions.TYPING)
+    await bot.send_chat_action(callback.message.chat.id, ChatActions.TYPING)
     await asyncio.sleep(1)
 
     await FormCriteria.next()
-    await message.answer('Enter Vote Average: ',
-                         reply_markup=vote_average)
+    await callback.message.answer('Enter Vote Average: ',
+                                  reply_markup=vote_average)
 
 
 @dp.message_handler(lambda message: not message.text.isdigit(), state=FormCriteria.voteaverage)
@@ -235,6 +279,7 @@ async def process_year_invalid(message: types.Message):
 
 @dp.message_handler(state=FormCriteria.year)
 async def process_year(message: types.Message, state: FSMContext):
+    user_id = message.from_user.id
     async with state.proxy() as data:
         data['year'] = message.text
 
@@ -250,9 +295,10 @@ async def process_year(message: types.Message, state: FSMContext):
                 md.text('Minimum Year:', data['year']),
                 sep='\n',
             ),
-            parse_mode=ParseMode.MARKDOWN,
+            parse_mode=ParseMode.MARKDOWN_V2,
             reply_markup=total_keyboard()
         )
+        update_messages_count(user_id)
 
 
 @dp.callback_query_handler(Text(startswith='total'), state=FormCriteria.year)
@@ -260,51 +306,34 @@ async def total(callback: types.CallbackQuery, state: FSMContext):
     try:
         async with state.proxy() as data:
             first = int(callback['data'].replace('total_', ''))
-
             genre = data['genre']
-            voteaverege = data['voteaverage']
+            voteaverage = data['voteaverage']
             year = data['year']
-            api_version = 3
-            api_base_url = f'https://api.themoviedb.org/{api_version}'
-            endpoint_path = f'/discover/movie'
-            endpoint = f'{api_base_url}{endpoint_path}?api_key={api_key}' \
-                       f'&sort_by=popularity.desc&include_adult=false&include_video=false&vote_count.gte=200' \
-                       f'&with_genres={genre}&vote_average.gte={voteaverege}&primary_release_year={year}'
+            movie_list = find_by_criteria(genre, voteaverage, year)
+            id = movie_list[first]['id']
+            genre_ids = movie_list[first]['genre_ids']
+            original_name = movie_list[first]['title']
+            original_language = movie_list[first]['original_language']
+            overview = movie_list[first]['overview']
+            vote_average = movie_list[first]['vote_average']
+            vote_count = movie_list[first]['vote_count']
+            release_date = movie_list[first]['release_date']
+            popularity = movie_list[first]['popularity']
+            poster_path = movie_list[first]['poster_path']
 
-            r = requests.get(endpoint)
-            data = r.json()
-            print(len(data))
-
-            id = data['results'][first]['id']
-            # genre_ids = data['results'][first]['genre_ids']
-            original_name = data['results'][first]['original_title']
-            original_language = data['results'][first]['original_language']
-            overview = data['results'][first]['overview']
-            vote_average = data['results'][first]['vote_average']
-            vote_count = data['results'][first]['vote_count']
-            release_date = data['results'][first]['release_date']
-            popularity = data['results'][first]['popularity']
-            poster_path = data['results'][first]['poster_path']
-
-            text_value = f' Movie: {original_name}\n Release date: {release_date}\n ' \
+            text_value = f' Movie: {original_name}\n Release date: {release_date}\n Genre id: {genre_ids}\n' \
                          f' Original languare {original_language}\n Overwiew: {overview}\n Voteaverage: {vote_average}\n' \
-                         f' Vote count: {vote_count}\n Popularity: {popularity}\n Movie_id: {id}\n' \
-                         f' Poster path: https://image.tmdb.org/t/p/w500/{poster_path}\n' \
-                         f'------------------------------------------------------------------------------------------'
+                         f' Vote count: {vote_count}\n Popularity: {popularity}\n Genre id: {genre_ids}\n Movie_id: {id}\n' \
+                         f' Poster path: https://image.tmdb.org/t/p/original{poster_path}\n' \
+                         f'-------------------------------------------------------------------------------------------------'
 
             # For "typing" message in top console
             await bot.send_chat_action(callback.message.chat.id, ChatActions.TYPING)
             await asyncio.sleep(0.25)
 
             await callback.message.edit_text(text=text_value)
-            await callback.message.edit_reply_markup(reply_markup=result_keyboard(first, len(data), original_name, id))
+            await callback.message.edit_reply_markup(
+                reply_markup=result_keyboard(first, len(movie_list), original_name, id))
     except IndexError as ex:
         await state.finish()
         await callback.message.reply('Sorry. No Results', reply_markup=menu_())
-
-
-
-@dp.callback_query_handler(Text(startswith='finish'), state=FormCriteria)
-async def passing(callback: types.CallbackQuery, state: FSMContext):
-    await callback.answer(text="Thnx For Using This Bot 🤖!")
-    await state.finish()

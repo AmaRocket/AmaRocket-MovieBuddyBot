@@ -1,1 +1,1 @@
-from .menu import criteria, genres, vote_average, totalkb
+from .menu import vote_average, totalkb

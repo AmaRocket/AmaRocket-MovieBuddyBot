@@ -1,15 +1,26 @@
 from aiogram import types
 
 
-def menu_():
-    btn = [
-        types.InlineKeyboardButton(text='Popular Movies', callback_data='popular_0'),
-        types.InlineKeyboardButton(text='Find By Title', callback_data='title_0'),
-        types.InlineKeyboardButton(text='Criteria', callback_data='criteria_0')
+def start():
+    buttons=[
+        types.InlineKeyboardButton(text='Search Movies', callback_data='movies'),
+        types.InlineKeyboardButton(text='My Movie List', callback_data='movie_list')
     ]
     keyboard = types.InlineKeyboardMarkup()
-    keyboard.add(*btn)
+    keyboard.add(*buttons)
     return keyboard
+
+
+def menu_():
+    buttons = [
+        types.InlineKeyboardButton(text='Popular Movies List', callback_data='popular_0'),
+        types.InlineKeyboardButton(text='Find Film By Title', callback_data='title_0'),
+        types.InlineKeyboardButton(text='Find Film By Criteria', callback_data='criteria_0')
+    ]
+    keyboard = types.InlineKeyboardMarkup(row_width=2)
+    keyboard.add(*buttons)
+    return keyboard
+
 
 
 # Inline buttons for a message with a popular movies.
@@ -21,15 +32,17 @@ def popular_movie_buttons(first, popular_list, original_name, id):
     ))
 
     buttons.append(types.InlineKeyboardButton(
-        text="More Info On TMDB",
+        text='More Info On TMDB',
         url=f'https://www.themoviedb.org/movie/{id}'
     ))
 
     if not first <= 0:
-        buttons.append(types.InlineKeyboardButton(text="<", callback_data=f"popular_{first - 1}"))
+        buttons.append(types.InlineKeyboardButton(text='<', callback_data=f'popular_{first - 1}'))
 
     if not first >= popular_list:
-        buttons.append(types.InlineKeyboardButton(text=">", callback_data=f"popular_{first + 1}"))
+        buttons.append(types.InlineKeyboardButton(text='>', callback_data=f'popular_{first + 1}'))
+
+    buttons.append(types.InlineKeyboardButton(text='Back To Movies Option', callback_data='movies'))
 
     keyboard = types.InlineKeyboardMarkup(row_width=2)
     keyboard.add(*buttons)
@@ -54,17 +67,17 @@ def title_movie_buttons(first, movie_list, original_name, id):
     ))
 
     buttons.append(types.InlineKeyboardButton(
-        text="More Info On TMDB",
+        text='More Info On TMDB',
         url=f'https://www.themoviedb.org/movie/{id}'
     ))
 
     if not first <= 0:
-        buttons.append(types.InlineKeyboardButton(text="<", callback_data=f"find_{first - 1}"))
+        buttons.append(types.InlineKeyboardButton(text='<', callback_data=f'find_{first - 1}'))
 
     if not first >= movie_list:
-        buttons.append(types.InlineKeyboardButton(text=">", callback_data=f"find_{first + 1}"))
+        buttons.append(types.InlineKeyboardButton(text='>', callback_data=f'find_{first + 1}'))
 
-    buttons.append(types.InlineKeyboardButton(text='Finish', callback_data='finish'))
+    buttons.append(types.InlineKeyboardButton(text='Back To Movies Option', callback_data='finish'))
 
     keyboard = types.InlineKeyboardMarkup(row_width=2)
     keyboard.add(*buttons)
@@ -80,8 +93,6 @@ def total_keyboard():
 
 
 def result_keyboard(first, data, original_name, id):
-    # Trailer Buttons
-
     buttons = []
 
     buttons.append(types.InlineKeyboardButton(
@@ -90,19 +101,92 @@ def result_keyboard(first, data, original_name, id):
     ))
 
     buttons.append(types.InlineKeyboardButton(
-        text="More Info On TMDB",
+        text='More Info On TMDB',
         url=f'https://www.themoviedb.org/movie/{id}'
     ))
 
     if not first <= 0:
-        buttons.append(types.InlineKeyboardButton(text="<", callback_data=f"total_{first - 1}"))
+        buttons.append(types.InlineKeyboardButton(text='<', callback_data=f'total_{first - 1}'))
 
     if not first >= data:
-        buttons.append(types.InlineKeyboardButton(text=">", callback_data=f"total_{first + 1}"))
+        buttons.append(types.InlineKeyboardButton(text='>', callback_data=f'total_{first + 1}'))
 
-    buttons.append(types.InlineKeyboardButton(text='Finish', callback_data='finish'))
+    buttons.append(types.InlineKeyboardButton(text='Back To Movies Option', callback_data='finish'))
 
     keyboard = types.InlineKeyboardMarkup(row_width=2)
     keyboard.add(*buttons)
 
     return keyboard
+
+
+# genres keyboard
+def genres_keyboard():
+    buttons = []
+
+    buttons.append(types.InlineKeyboardButton(text='Action', callback_data='28'))
+    buttons.append(types.InlineKeyboardButton(text='Adventure', callback_data='12'))
+    buttons.append(types.InlineKeyboardButton(text='Animation', callback_data='16'))
+    buttons.append(types.InlineKeyboardButton(text='Comedy', callback_data='35'))
+    buttons.append(types.InlineKeyboardButton(text='Crime', callback_data='80'))
+    buttons.append(types.InlineKeyboardButton(text='Documentary', callback_data='99'))
+    buttons.append(types.InlineKeyboardButton(text='Drama', callback_data='18'))
+    buttons.append(types.InlineKeyboardButton(text='Family', callback_data='10751'))
+    buttons.append(types.InlineKeyboardButton(text='Fantasy', callback_data='14'))
+    buttons.append(types.InlineKeyboardButton(text='History', callback_data='36'))
+    buttons.append(types.InlineKeyboardButton(text='Horror', callback_data='27'))
+    buttons.append(types.InlineKeyboardButton(text='Music', callback_data='10402'))
+    buttons.append(types.InlineKeyboardButton(text='Mystery', callback_data='9648'))
+    buttons.append(types.InlineKeyboardButton(text='Romance', callback_data='10749'))
+    buttons.append(types.InlineKeyboardButton(text='Science Fiction', callback_data='878'))
+    buttons.append(types.InlineKeyboardButton(text='TV Movie', callback_data='10770'))
+    buttons.append(types.InlineKeyboardButton(text='Thriller', callback_data='53'))
+    buttons.append(types.InlineKeyboardButton(text='War', callback_data='10752'))
+    buttons.append(types.InlineKeyboardButton(text='Western', callback_data='37'))
+
+    keyboard = types.InlineKeyboardMarkup(row_width=4)
+    keyboard.insert(types.InlineKeyboardButton(text='Back To Movies Option', callback_data='finish'))
+    keyboard.add(*buttons)
+
+    return keyboard
+
+
+# # Vote average keyboard
+# def rate_keyboard():
+#     buttons = []
+#
+#     buttons.append(types.InlineKeyboardButton(text='1', callback_data='1'))
+#     buttons.append(types.InlineKeyboardButton(text='2', callback_data='2'))
+#     buttons.append(types.InlineKeyboardButton(text='3', callback_data='3'))
+#     buttons.append(types.InlineKeyboardButton(text='4', callback_data='4'))
+#     buttons.append(types.InlineKeyboardButton(text='5', callback_data='5'))
+#     buttons.append(types.InlineKeyboardButton(text='6', callback_data='6'))
+#     buttons.append(types.InlineKeyboardButton(text='7', callback_data='7'))
+#     buttons.append(types.InlineKeyboardButton(text='8', callback_data='8'))
+#     buttons.append(types.InlineKeyboardButton(text='9', callback_data='9'))
+#
+#     keyboard = types.InlineKeyboardMarkup(row_width=3)
+#     keyboard.insert(types.InlineKeyboardButton(text='Back To Movies Option', callback_data='finish'))
+#     keyboard.add(*buttons)
+#
+#     return keyboard
+#
+#
+# # Vote average keyboard
+# def year_keyboard():
+#     buttons = []
+#
+#     buttons.append(types.InlineKeyboardButton(text='1940', callback_data='1940'))
+#     buttons.append(types.InlineKeyboardButton(text='1950', callback_data='1950'))
+#     buttons.append(types.InlineKeyboardButton(text='1960', callback_data='1960'))
+#     buttons.append(types.InlineKeyboardButton(text='1970', callback_data='1970'))
+#     buttons.append(types.InlineKeyboardButton(text='1980', callback_data='1980'))
+#     buttons.append(types.InlineKeyboardButton(text='1990', callback_data='1990'))
+#     buttons.append(types.InlineKeyboardButton(text='2000', callback_data='2000'))
+#     buttons.append(types.InlineKeyboardButton(text='2010', callback_data='2010'))
+#     buttons.append(types.InlineKeyboardButton(text='2020', callback_data='2020'))
+#
+#     keyboard = types.InlineKeyboardMarkup(row_width=3)
+#     keyboard.insert(types.InlineKeyboardButton(text='Back To Movies Option', callback_data='finish'))
+#     keyboard.add(*buttons)
+#
+#     return keyboard

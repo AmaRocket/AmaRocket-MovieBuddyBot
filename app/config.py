@@ -4,10 +4,10 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # bot token
-token = os.getenv("token")
+TOKEN = os.getenv("TOKEN")
 
 # api tmdb key
-api_key = os.getenv('api_key')  # v3
+API_KEY = os.getenv('API_KEY')  # v3
 
 # postgres
 DB_URI = os.getenv('URI')
