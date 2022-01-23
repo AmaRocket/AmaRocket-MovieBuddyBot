@@ -7,7 +7,8 @@ from aiogram.dispatcher import FSMContext
 
 from states.criteria import FormCriteria
 
-from TEST_TMDB_PIPY import popular_movie, find_by_name, find_by_criteria
+from TEST_TMDB_PIPY import Tmdb
+# from TEST_TMDB_PIPY import popular_movie, find_by_name, find_by_criteria
 from config import DB_URI
 from keyboards.default import vote_average
 
@@ -83,7 +84,7 @@ async def movies(callback: types.CallbackQuery):
 # List Of Popular Movies
 @dp.callback_query_handler(Text(startswith='popular'))
 async def poppular_by(callback: types.CallbackQuery):
-    popular_list = popular_movie()
+    popular_list = Tmdb.popular_movie(Tmdb)
     first = int(callback['data'].replace('popular_', ''))
     # Message List
     id = popular_list[first]['id']
@@ -146,7 +147,7 @@ async def title(callback: types.CallbackQuery, state: FSMContext):
         async with state.proxy() as data:
             first = int(callback['data'].replace('find_', ''))
             name = data['title']
-            movie_list = find_by_name(name)
+            movie_list = Tmdb.find_by_name(Tmdb, name)
             # print(movie_list)
 
             id = movie_list[first]['id']
@@ -297,7 +298,7 @@ async def total(callback: types.CallbackQuery, state: FSMContext):
             genre = data['genre']
             voteaverage = data['voteaverage']
             year = data['year']
-            movie_list = find_by_criteria(genre, voteaverage, year)
+            movie_list = Tmdb.find_by_criteria(Tmdb, genre, voteaverage, year)
             id = movie_list[first]['id']
             genre_ids = movie_list[first]['genre_ids']
             original_name = movie_list[first]['title']
