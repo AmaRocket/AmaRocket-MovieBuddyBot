@@ -52,14 +52,29 @@ def popular_movie_buttons(first, popular_list, original_name, id):
     return keyboard
 
 
-def similar_movie_keyboard(first, movie_list):
+def similar_movie_keyboard(first, movie_list, original_name, id):
     buttons = []
+    buttons.append(types.InlineKeyboardButton(
+        text='Trailer YouTube',
+        url=f'https://www.youtube.com/results?search_query=+{original_name}+trailer'
+    ))
+
+    buttons.append(types.InlineKeyboardButton(
+        text='More Info On TMDB',
+        url=f'https://www.themoviedb.org/movie/{id}'
+    ))
 
     if not first <= 0:
         buttons.append(types.InlineKeyboardButton(text='<', callback_data=f'similar_{first - 1}'))
 
     if not first >= movie_list:
-        buttons.append(types.InlineKeyboardButton(text='>', callback_data=f'similar{first + 1}'))
+        buttons.append(types.InlineKeyboardButton(text='>', callback_data=f'similar_{first + 1}'))
+
+    buttons.append(types.InlineKeyboardButton(text='Back To Movies Option', callback_data='movies'))
+
+    buttons.append(types.InlineKeyboardButton(text='Add To Movie List', callback_data='add_to_movie_list'))
+
+    buttons.append(types.InlineKeyboardButton(text='Movie Like This', callback_data='similar_0'))
 
     keyboard = types.InlineKeyboardMarkup(row_width=2)
     keyboard.add(*buttons)
