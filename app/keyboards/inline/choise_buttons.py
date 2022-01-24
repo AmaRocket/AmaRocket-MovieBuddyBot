@@ -2,7 +2,7 @@ from aiogram import types
 
 
 def start():
-    buttons=[
+    buttons = [
         types.InlineKeyboardButton(text='Search Movies', callback_data='movies'),
         types.InlineKeyboardButton(text='My Movie List', callback_data='movie_list')
     ]
@@ -20,7 +20,6 @@ def menu_():
     keyboard = types.InlineKeyboardMarkup(row_width=2)
     keyboard.add(*buttons)
     return keyboard
-
 
 
 # Inline buttons for a message with a popular movies.
@@ -43,6 +42,24 @@ def popular_movie_buttons(first, popular_list, original_name, id):
         buttons.append(types.InlineKeyboardButton(text='>', callback_data=f'popular_{first + 1}'))
 
     buttons.append(types.InlineKeyboardButton(text='Back To Movies Option', callback_data='movies'))
+
+    buttons.append(types.InlineKeyboardButton(text='Add To Movie List', callback_data='add_to_movie_list'))
+
+    buttons.append(types.InlineKeyboardButton(text='Movie Like This', callback_data='similar_0'))
+
+    keyboard = types.InlineKeyboardMarkup(row_width=2)
+    keyboard.add(*buttons)
+    return keyboard
+
+
+def similar_movie_keyboard(first, movie_list):
+    buttons = []
+
+    if not first <= 0:
+        buttons.append(types.InlineKeyboardButton(text='<', callback_data=f'similar_{first - 1}'))
+
+    if not first >= movie_list:
+        buttons.append(types.InlineKeyboardButton(text='>', callback_data=f'similar{first + 1}'))
 
     keyboard = types.InlineKeyboardMarkup(row_width=2)
     keyboard.add(*buttons)
@@ -79,6 +96,8 @@ def title_movie_buttons(first, movie_list, original_name, id):
 
     buttons.append(types.InlineKeyboardButton(text='Back To Movies Option', callback_data='finish'))
 
+    buttons.append(types.InlineKeyboardButton(text='Movie Like This', callback_data='similar_0'))
+
     keyboard = types.InlineKeyboardMarkup(row_width=2)
     keyboard.add(*buttons)
     return keyboard
@@ -112,6 +131,8 @@ def result_keyboard(first, data, original_name, id):
         buttons.append(types.InlineKeyboardButton(text='>', callback_data=f'total_{first + 1}'))
 
     buttons.append(types.InlineKeyboardButton(text='Back To Movies Option', callback_data='finish'))
+
+    buttons.append(types.InlineKeyboardButton(text='Movie Like This', callback_data='similar_0'))
 
     keyboard = types.InlineKeyboardMarkup(row_width=2)
     keyboard.add(*buttons)
@@ -148,7 +169,6 @@ def genres_keyboard():
     keyboard.add(*buttons)
 
     return keyboard
-
 
 # # Vote average keyboard
 # def rate_keyboard():

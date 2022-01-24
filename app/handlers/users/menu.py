@@ -1,12 +1,15 @@
 import logging
+import re
 
 import aiogram.utils.markdown as md
 
 from aiogram import types
 from aiogram.dispatcher import FSMContext
-from aiogram.dispatcher.filters.state import StatesGroup, State
 
-from TEST_TMDB_PIPY import popular_movie, find_by_name, find_by_criteria
+from states.criteria import FormCriteria
+
+from TEST_TMDB_PIPY import TheMovie
+
 from config import DB_URI
 from keyboards.default import vote_average
 
@@ -27,27 +30,16 @@ import psycopg2
 db_connection = psycopg2.connect(DB_URI, sslmode='require')
 db_object = db_connection.cursor()
 
+
 def update_messages_count(user_id):
     db_object.execute(f"UPDATE users SET count_messages = count_messages + 1 WHERE id = {user_id}")
     db_connection.commit()
 
 
-
 # =====================================================================================================================
 
 
-# ================ FINITE STATE MACHINE ===============================================================================
-class FormCriteria(StatesGroup):
-    title = State()
-    genre = State()
-    voteaverage = State()
-    year = State()
-
-
-# =====================================================================================================================
-
-
-# ================ START FUNCIONS + ADD USER TO DB ====================================================================
+# ================ START FUNCTIONS + ADD USER TO DB ====================================================================
 @dp.message_handler(Command('start'))
 async def start_menu(message: Message):
     user_id = message.from_user.id
@@ -75,6 +67,7 @@ async def user_message(message):
     user_id = message.from_user.id
     update_messages_count(user_id)
 
+
 # =====================================================================================================================
 
 
@@ -89,13 +82,12 @@ async def movies(callback: types.CallbackQuery):
     await callback.message.reply('Choose The Option 👇', reply_markup=menu_())
 
 
-
 # List Of Popular Movies
 @dp.callback_query_handler(Text(startswith='popular'))
 async def poppular_by(callback: types.CallbackQuery):
-
-    popular_list = popular_movie()
+    popular_list = TheMovie().movie.popular()
     first = int(callback['data'].replace('popular_', ''))
+    print(first)
     # Message List
     id = popular_list[first]['id']
     genre_ids = popular_list[first]['genre_ids']
@@ -108,11 +100,26 @@ async def poppular_by(callback: types.CallbackQuery):
     popularity = popular_list[first]['popularity']
     poster_path = popular_list[first]['poster_path']
 
-    text_value = f' Movie: {original_name}\n Release date: {release_date}\n Genre id: {genre_ids}\n' \
+    text_value = f' ID: {id}\n Movie: {original_name}\n Release date: {release_date}\n Genre id: {genre_ids}\n' \
                  f' Original languare {original_language}\n Overwiew: {overview}\n Voteaverage: {vote_average}\n' \
-                 f' Vote count: {vote_count}\n Popularity: {popularity}\n Genre id: {genre_ids}\n Movie_id: {id}\n' \
+                 f' Vote count: {vote_count}\n Popularity: {popularity}\n Genre id: {genre_ids}\n ' \
                  f' Poster path: https://image.tmdb.org/t/p/original{poster_path}\n' \
                  f'------------------------------------------------------------------------------------------'
+
+    # text_value = {
+    #     'Movie': f'{original_name}',
+    #     'Release_date': f'{release_date}',
+    #     'Genre_id': f'{genre_ids}',
+    #     'Original_languare': f'{original_language}',
+    #     'Overwiew': f'{overview}',
+    #     'Voteaverage': f'{vote_average}',
+    #     'Vote_count': f'{vote_count}',
+    #     'Popularity': f'{popularity}',
+    #     'Movie_id': f'{id}',
+    #     'Poster path': f'https://image.tmdb.org/t/p/original{poster_path}'
+    # }
+
+
     # For "typing" message in top console
     await bot.send_chat_action(callback.message.chat.id, ChatActions.TYPING)
     await asyncio.sleep(1)
@@ -120,6 +127,7 @@ async def poppular_by(callback: types.CallbackQuery):
     await callback.message.edit_text(text=text_value)
     await callback.message.edit_reply_markup(
         reply_markup=popular_movie_buttons(first, len(popular_list), original_name, id))
+
 
 
 
@@ -151,6 +159,8 @@ async def find_by_title(message: types.Message, state: FSMContext):
         )
     update_messages_count(user_id)
 
+# =====================================================================================================================
+
 # Find Movie By Title
 @dp.callback_query_handler(Text(startswith='find'), state=FormCriteria.title)
 async def title(callback: types.CallbackQuery, state: FSMContext):
@@ -158,8 +168,7 @@ async def title(callback: types.CallbackQuery, state: FSMContext):
         async with state.proxy() as data:
             first = int(callback['data'].replace('find_', ''))
             name = data['title']
-            movie_list = find_by_name(name)
-            # print(movie_list)
+            movie_list = TheMovie().movie.search(name)
 
             id = movie_list[first]['id']
             genre_ids = movie_list[first]['genre_ids']
@@ -172,11 +181,12 @@ async def title(callback: types.CallbackQuery, state: FSMContext):
             popularity = movie_list[first]['popularity']
             poster_path = movie_list[first]['poster_path']
 
-            text_value = f' Movie: {original_name}\n Release date: {release_date}\n Genre id: {genre_ids}\n' \
+            text_value = f' ID: {id}\n Movie: {original_name}\n Release date: {release_date}\n Genre id: {genre_ids}\n' \
                          f' Original languare {original_language}\n Overwiew: {overview}\n Voteaverage: {vote_average}\n' \
-                         f' Vote count: {vote_count}\n Popularity: {popularity}\n Genre id: {genre_ids}\n Movie_id: {id}\n' \
+                         f' Vote count: {vote_count}\n Popularity: {popularity}\n Genre id: {genre_ids}\n ' \
                          f' Poster path: https://image.tmdb.org/t/p/original{poster_path}\n' \
-                         f'-------------------------------------------------------------------------------------------------'
+                         f'------------------------------------------------------------------------------------------'
+
             # For "typing" message in top console
             await bot.send_chat_action(callback.message.chat.id, ChatActions.TYPING)
             await asyncio.sleep(1)
@@ -309,7 +319,12 @@ async def total(callback: types.CallbackQuery, state: FSMContext):
             genre = data['genre']
             voteaverage = data['voteaverage']
             year = data['year']
-            movie_list = find_by_criteria(genre, voteaverage, year)
+            movie_list = TheMovie().discover.discover_movies({
+                                                'sort_by': 'popularity.desc',
+                                                'with_genres': f'{genre}',
+                                                'vote_average.gte': f'{voteaverage}',
+                                                'primary_release_year': f'{year}'
+                                            })
             id = movie_list[first]['id']
             genre_ids = movie_list[first]['genre_ids']
             original_name = movie_list[first]['title']
@@ -321,11 +336,11 @@ async def total(callback: types.CallbackQuery, state: FSMContext):
             popularity = movie_list[first]['popularity']
             poster_path = movie_list[first]['poster_path']
 
-            text_value = f' Movie: {original_name}\n Release date: {release_date}\n Genre id: {genre_ids}\n' \
+            text_value = f' ID: {id}\n Movie: {original_name}\n Release date: {release_date}\n Genre id: {genre_ids}\n' \
                          f' Original languare {original_language}\n Overwiew: {overview}\n Voteaverage: {vote_average}\n' \
-                         f' Vote count: {vote_count}\n Popularity: {popularity}\n Genre id: {genre_ids}\n Movie_id: {id}\n' \
+                         f' Vote count: {vote_count}\n Popularity: {popularity}\n Genre id: {genre_ids}\n ' \
                          f' Poster path: https://image.tmdb.org/t/p/original{poster_path}\n' \
-                         f'-------------------------------------------------------------------------------------------------'
+                         f'------------------------------------------------------------------------------------------'
 
             # For "typing" message in top console
             await bot.send_chat_action(callback.message.chat.id, ChatActions.TYPING)
@@ -337,3 +352,45 @@ async def total(callback: types.CallbackQuery, state: FSMContext):
     except IndexError as ex:
         await state.finish()
         await callback.message.reply('Sorry. No Results', reply_markup=menu_())
+
+
+
+# Similar Movies
+@dp.callback_query_handler(Text(startswith='similar'))  #, state=FormCriteria)
+async def movie_like_this(callback: types.CallbackQuery):   # state: FSMContext):
+    # await state.finish()
+    message = callback.message.text
+
+    movie_id = (re.findall(r'ID: (\d+)', message))
+    m_id = movie_id[-1]
+
+
+    movie_list = TheMovie().movie.recommendations(m_id)
+    first = int(callback['data'].replace('similar_', ''))
+
+    id = movie_list[first]['id']
+    genre_ids = movie_list[first]['genre_ids']
+    original_name = movie_list[first]['title']
+    original_language = movie_list[first]['original_language']
+    overview = movie_list[first]['overview']
+    vote_average = movie_list[first]['vote_average']
+    vote_count = movie_list[first]['vote_count']
+    release_date = movie_list[first]['release_date']
+    popularity = movie_list[first]['popularity']
+    poster_path = movie_list[first]['poster_path']
+
+    text_value = f' ID: {id}\n Movie: {original_name}\n Release date: {release_date}\n Genre id: {genre_ids}\n' \
+                 f' Original languare {original_language}\n Overwiew: {overview}\n Voteaverage: {vote_average}\n' \
+                 f' Vote count: {vote_count}\n Popularity: {popularity}\n Genre id: {genre_ids}\n ' \
+                 f' Poster path: https://image.tmdb.org/t/p/original{poster_path}\n' \
+                 f'------------------------------------------------------------------------------------------'
+
+
+    # For "typing" message in top console
+    await bot.send_chat_action(callback.message.chat.id, ChatActions.TYPING)
+    await asyncio.sleep(1)
+
+    await callback.message.edit_text(text=text_value)
+    await callback.message.edit_reply_markup(
+        reply_markup=popular_movie_buttons(first, len(movie_list), original_name, id))
+
