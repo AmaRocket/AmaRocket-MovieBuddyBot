@@ -11,7 +11,7 @@ class TheMovie(TMDb):
     tmdb = TMDb()
     tmdb.api_key = API_KEY
 
-    tmdb.language = 'ru'
+    tmdb.language = 'en'
     tmdb.debug = True
 
     movie = Movie()

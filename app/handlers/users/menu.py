@@ -6,11 +6,12 @@ import aiogram.utils.markdown as md
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 
+from data_base import db
 from states.criteria import FormCriteria
 
 from TEST_TMDB_PIPY import TheMovie
 
-from config import DB_URI
+# from config import DB_URI
 from keyboards.default import vote_average
 
 from keyboards.inline.choise_buttons import popular_movie_buttons, menu_, title_movie_buttons, total_keyboard, \
@@ -27,14 +28,14 @@ import psycopg2
 
 # ================ DATA BASE SETTINGS =================================================================================
 
-db_connection = psycopg2.connect(DB_URI, sslmode='require')
-db_object = db_connection.cursor()
-
-
-def update_messages_count(user_id):
-    db_object.execute(f"UPDATE users SET count_messages = count_messages + 1 WHERE id = {user_id}")
-    db_connection.commit()
-
+# db_connection = psycopg2.connect(DB_URI, sslmode='require')
+# db_object = db_connection.cursor()
+#
+#
+# def update_messages_count(user_id):
+#     db_object.execute(f"UPDATE users SET count_messages = count_messages + 1 WHERE id = {user_id}")
+#     db_connection.commit()
+#
 
 # =====================================================================================================================
 
@@ -42,7 +43,7 @@ def update_messages_count(user_id):
 # ================ START FUNCTIONS + ADD USER TO DB ====================================================================
 @dp.message_handler(Command('start'))
 async def start_menu(message: Message):
-    user_id = message.from_user.id
+    # user_id = message.from_user.id
     username = message.from_user.first_name
 
     # For "typing" message in top console
@@ -52,20 +53,20 @@ async def start_menu(message: Message):
     await message.reply(f'Hello {username}. \nSelect Your Option From Menu 👇', reply_markup=start())
 
     # add users info in db
-    db_object.execute(f'SELECT id FROM users WHERE id = {user_id}')
-    result = db_object.fetchone()
+    # db_object.execute(f'SELECT id FROM users WHERE id = {user_id}')
+    # result = db_object.fetchone()
 
-    if not result:
-        db_object.execute('INSERT INTO users (id, username, count_messages) VALUES (%s, %s, %s)', (id, username, 0))
-        db_connection.commit()
-
-    update_messages_count(user_id)
-
+    # if not result:
+    #     db_object.execute('INSERT INTO users (id, username, count_messages) VALUES (%s, %s, %s)', (id, username, 0))
+    #     db_connection.commit()
+    #
+    # update_messages_count(user_id)
+    #
 
 @dp.message_handler(lambda message: True, content_types='text')
 async def user_message(message):
     user_id = message.from_user.id
-    update_messages_count(user_id)
+    # update_messages_count(user_id)
 
 
 # =====================================================================================================================
@@ -144,7 +145,8 @@ async def find_by_title(message: types.Message, state: FSMContext):
             parse_mode=ParseMode.MARKDOWN_V2,
             reply_markup=title_keyboard()
         )
-    update_messages_count(user_id)
+        await db.add_command(state)
+    # update_messages_count(user_id)
 
 # =====================================================================================================================
 
@@ -295,7 +297,7 @@ async def process_year(message: types.Message, state: FSMContext):
             parse_mode=ParseMode.MARKDOWN_V2,
             reply_markup=total_keyboard()
         )
-        update_messages_count(user_id)
+        # update_messages_count(user_id)
 
 
 @dp.callback_query_handler(Text(startswith='total'), state=FormCriteria.year)
@@ -338,6 +340,53 @@ async def total(callback: types.CallbackQuery, state: FSMContext):
                 reply_markup=result_keyboard(first, len(movie_list), original_name, id))
     except IndexError as ex:
         await state.finish()
+        await callback.message.reply('Sorry. No Results', reply_markup=menu_())
+
+
+# Similar Movies
+@dp.callback_query_handler(Text(startswith='similar'))  #, state=FormCriteria)
+async def movie_like_this(callback: types.CallbackQuery):   # state: FSMContext):
+    try:
+
+        # await state.finish()
+        message = callback.message.text
+
+        movie_id = (re.findall(r'ID: (\d+)', message))
+        m_id = movie_id[-1]
+
+
+        movie_list = TheMovie().movie.recommendations(m_id)
+        first = int(callback['data'].replace('similar_', ''))
+        print(first)
+        print(type(first))
+
+        id = movie_list[first]['id']
+        genre_ids = movie_list[first]['genre_ids']
+        original_name = movie_list[first]['title']
+        original_language = movie_list[first]['original_language']
+        overview = movie_list[first]['overview']
+        vote_average = movie_list[first]['vote_average']
+        vote_count = movie_list[first]['vote_count']
+        release_date = movie_list[first]['release_date']
+        popularity = movie_list[first]['popularity']
+        poster_path = movie_list[first]['poster_path']
+
+        text_value = f' ID: {id}\n Movie: {original_name}\n Release date: {release_date}\n Genre id: {genre_ids}\n' \
+                     f' Original languare {original_language}\n Overwiew: {overview}\n Voteaverage: {vote_average}\n' \
+                     f' Vote count: {vote_count}\n Popularity: {popularity}\n Genre id: {genre_ids}\n ' \
+                     f' Poster path: https://image.tmdb.org/t/p/original{poster_path}\n' \
+                     f'---------------------------------------------------------------------------------------------'
+
+
+        # For "typing" message in top console
+        await bot.send_chat_action(callback.message.chat.id, ChatActions.TYPING)
+        await asyncio.sleep(1)
+
+        await callback.message.edit_text(text=text_value)
+        await callback.message.edit_reply_markup(
+            reply_markup=similar_movie_keyboard(first, len(movie_list), original_name, id))
+    except IndexError as ex:
+        # await state.finish()
         await callback.message.reply('Sorry. No Results', reply_markup=menu_())
 
 
@@ -384,6 +433,7 @@ async def movie_like_this(callback: types.CallbackQuery):   # state: FSMContext)
         await callback.message.edit_text(text=text_value)
         await callback.message.edit_reply_markup(
             reply_markup=similar_movie_keyboard(first, len(movie_list), original_name, id))
+
     except IndexError as ex:
         # await state.finish()
         await callback.message.reply('Sorry. No Results', reply_markup=menu_())

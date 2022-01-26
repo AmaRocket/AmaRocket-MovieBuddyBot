@@ -1,17 +1,14 @@
--- Table: public.users
-
--- DROP TABLE IF EXISTS public.users;
-
-CREATE TABLE IF NOT EXISTS public.users
+create table users
 (
-    id integer NOT NULL,
-    username text COLLATE pg_catalog."default",
-    count_messages integer NOT NULL DEFAULT 0,
-    requests text COLLATE pg_catalog."default",
-    CONSTRAINT users_pkey PRIMARY KEY (id)
-)
+    chat_id   bigint            not null
+        constraint users_pk
+            primary key,
+    username  text,
+    id        serial            not null,
+);
 
-TABLESPACE pg_default;
+alter table users
+    owner to telegram_db;
 
-ALTER TABLE IF EXISTS public.users
-    OWNER to flask_db;
+create unique index users_id_uindex
+    on users (id);
