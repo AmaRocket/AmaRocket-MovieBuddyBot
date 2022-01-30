@@ -1,9 +1,11 @@
 from loader import bot
 from data_base import db
 
-async def on_startup(_):
+
+async def on_startup(dp):
     print('GO GO GO')
     await db.create_db()
+
 
 async def on_shutdown(dp):
     await bot.close()

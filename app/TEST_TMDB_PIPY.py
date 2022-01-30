@@ -16,3 +16,11 @@ class TheMovie(TMDb):
 
     movie = Movie()
     discover = Discover()
+
+
+
+# a = TheMovie()
+#
+# people = a.movie.details(1488)
+# print(people['genres'])
+# print(people)
