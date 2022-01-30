@@ -135,3 +135,4 @@ about
 about.txt
 tmdb_api.py
 result.json
+.__pycache__
