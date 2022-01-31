@@ -2,7 +2,7 @@ from aiogram import types
 
 
 def start():
-    buttons=[
+    buttons = [
         types.InlineKeyboardButton(text='Search Movies', callback_data='movies'),
         types.InlineKeyboardButton(text='My Movie List', callback_data='movie_list')
     ]
@@ -20,7 +20,6 @@ def menu_():
     keyboard = types.InlineKeyboardMarkup(row_width=2)
     keyboard.add(*buttons)
     return keyboard
-
 
 
 # Inline buttons for a message with a popular movies.
@@ -43,6 +42,39 @@ def popular_movie_buttons(first, popular_list, original_name, id):
         buttons.append(types.InlineKeyboardButton(text='>', callback_data=f'popular_{first + 1}'))
 
     buttons.append(types.InlineKeyboardButton(text='Back To Movies Option', callback_data='movies'))
+
+    buttons.append(types.InlineKeyboardButton(text='Add To Movie List', callback_data='add_to_movie_list'))
+
+    buttons.append(types.InlineKeyboardButton(text='Movie Like This', callback_data='similar_0'))
+
+    keyboard = types.InlineKeyboardMarkup(row_width=2)
+    keyboard.add(*buttons)
+    return keyboard
+
+
+def similar_movie_keyboard(first, movie_list, original_name, id):
+    buttons = []
+    buttons.append(types.InlineKeyboardButton(
+        text='Trailer YouTube',
+        url=f'https://www.youtube.com/results?search_query=+{original_name}+trailer'
+    ))
+
+    buttons.append(types.InlineKeyboardButton(
+        text='More Info On TMDB',
+        url=f'https://www.themoviedb.org/movie/{id}'
+    ))
+
+    if not first <= 0:
+        buttons.append(types.InlineKeyboardButton(text='<', callback_data=f'similar_{first - 1}'))
+
+    if not first >= movie_list:
+        buttons.append(types.InlineKeyboardButton(text='>', callback_data=f'similar_{first + 1}'))
+
+    buttons.append(types.InlineKeyboardButton(text='Back To Movies Option', callback_data='movies'))
+
+    buttons.append(types.InlineKeyboardButton(text='Add To Movie List', callback_data='add_to_movie_list'))
+
+    buttons.append(types.InlineKeyboardButton(text='Movie Like This', callback_data='similar_0'))
 
     keyboard = types.InlineKeyboardMarkup(row_width=2)
     keyboard.add(*buttons)
@@ -77,7 +109,12 @@ def title_movie_buttons(first, movie_list, original_name, id):
     if not first >= movie_list:
         buttons.append(types.InlineKeyboardButton(text='>', callback_data=f'find_{first + 1}'))
 
-    buttons.append(types.InlineKeyboardButton(text='Back To Movies Option', callback_data='finish'))
+    buttons.append(types.InlineKeyboardButton(text='Back To Movies Option', callback_data='movies'))
+
+    buttons.append(types.InlineKeyboardButton(text='Add To Movie List', callback_data='add_to_movie_list'))
+
+    buttons.append(types.InlineKeyboardButton(text='Movie Like This', callback_data='similar_0'))
+
 
     keyboard = types.InlineKeyboardMarkup(row_width=2)
     keyboard.add(*buttons)
@@ -111,7 +148,11 @@ def result_keyboard(first, data, original_name, id):
     if not first >= data:
         buttons.append(types.InlineKeyboardButton(text='>', callback_data=f'total_{first + 1}'))
 
-    buttons.append(types.InlineKeyboardButton(text='Back To Movies Option', callback_data='finish'))
+    buttons.append(types.InlineKeyboardButton(text='Back To Movies Option', callback_data='movies'))
+
+    buttons.append(types.InlineKeyboardButton(text='Add To Movie List', callback_data='add_to_movie_list'))
+
+    buttons.append(types.InlineKeyboardButton(text='Movie Like This', callback_data='similar_0'))
 
     keyboard = types.InlineKeyboardMarkup(row_width=2)
     keyboard.add(*buttons)
@@ -148,45 +189,3 @@ def genres_keyboard():
     keyboard.add(*buttons)
 
     return keyboard
-
-
-# # Vote average keyboard
-# def rate_keyboard():
-#     buttons = []
-#
-#     buttons.append(types.InlineKeyboardButton(text='1', callback_data='1'))
-#     buttons.append(types.InlineKeyboardButton(text='2', callback_data='2'))
-#     buttons.append(types.InlineKeyboardButton(text='3', callback_data='3'))
-#     buttons.append(types.InlineKeyboardButton(text='4', callback_data='4'))
-#     buttons.append(types.InlineKeyboardButton(text='5', callback_data='5'))
-#     buttons.append(types.InlineKeyboardButton(text='6', callback_data='6'))
-#     buttons.append(types.InlineKeyboardButton(text='7', callback_data='7'))
-#     buttons.append(types.InlineKeyboardButton(text='8', callback_data='8'))
-#     buttons.append(types.InlineKeyboardButton(text='9', callback_data='9'))
-#
-#     keyboard = types.InlineKeyboardMarkup(row_width=3)
-#     keyboard.insert(types.InlineKeyboardButton(text='Back To Movies Option', callback_data='finish'))
-#     keyboard.add(*buttons)
-#
-#     return keyboard
-#
-#
-# # Vote average keyboard
-# def year_keyboard():
-#     buttons = []
-#
-#     buttons.append(types.InlineKeyboardButton(text='1940', callback_data='1940'))
-#     buttons.append(types.InlineKeyboardButton(text='1950', callback_data='1950'))
-#     buttons.append(types.InlineKeyboardButton(text='1960', callback_data='1960'))
-#     buttons.append(types.InlineKeyboardButton(text='1970', callback_data='1970'))
-#     buttons.append(types.InlineKeyboardButton(text='1980', callback_data='1980'))
-#     buttons.append(types.InlineKeyboardButton(text='1990', callback_data='1990'))
-#     buttons.append(types.InlineKeyboardButton(text='2000', callback_data='2000'))
-#     buttons.append(types.InlineKeyboardButton(text='2010', callback_data='2010'))
-#     buttons.append(types.InlineKeyboardButton(text='2020', callback_data='2020'))
-#
-#     keyboard = types.InlineKeyboardMarkup(row_width=3)
-#     keyboard.insert(types.InlineKeyboardButton(text='Back To Movies Option', callback_data='finish'))
-#     keyboard.add(*buttons)
-#
-#     return keyboard
