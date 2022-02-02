@@ -71,8 +71,12 @@ async def movie_list(callback: types.CallbackQuery):
     first = int(callback['data'].replace('movie_list_', ''))
 
     data = await db.show_movies()
-    for num,i in enumerate(data):
-        text = ('<b> {data} </b>')
+    movie = []
+    for i in data:
+        movie.append(i)
+
+    # data = dict(movie)
+    print(movie)
 
 
 
@@ -84,15 +88,14 @@ async def movie_list(callback: types.CallbackQuery):
         # data = i.data
 
 
-        print('------------------')
+    print('------------------')
 
 
 
 
 
-    await callback.message.edit_text(text=text.format(data = i.data))
-    await callback.message.edit_reply_markup(
-        reply_markup=my_movies(first, len(i.data), title, id))
+    await callback.message.edit_text(text=i.data)
+    # await callback.message.edit_reply_markup(reply_markup=my_movies(first, len(movie), title, id))
 
     # await callback.message.reply('It Wll Be Work Soon ✌️')
     await callback.answer()
@@ -148,6 +151,7 @@ async def movies(callback: types.CallbackQuery):
 @dp.callback_query_handler(Text(startswith='popular'))
 async def poppular_by(callback: types.CallbackQuery):
     popular_list = TheMovie().movie.popular()
+    # print(popular_list)
     first = int(callback['data'].replace('popular_', ''))
 
     # Message List

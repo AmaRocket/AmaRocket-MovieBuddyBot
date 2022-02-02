@@ -10,7 +10,7 @@ def start():
     keyboard.add(*buttons)
     return keyboard
 
-def my_movies(first, data, title, id):
+def my_movies(first, movie, title, id):
 
     buttons = []
 
@@ -27,7 +27,7 @@ def my_movies(first, data, title, id):
     if not first <= 0:
         buttons.append(types.InlineKeyboardButton(text='<', callback_data=f'movie_list_{first - 1}'))
 
-    if not first >= data:
+    if not first >= movie:
         buttons.append(types.InlineKeyboardButton(text='>', callback_data=f'movie_list_{first + 1}'))
 
     buttons.append(types.InlineKeyboardButton(text='Back To Movies Option', callback_data='movies'))
