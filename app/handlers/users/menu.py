@@ -2,7 +2,6 @@ import datetime
 import logging
 import re
 
-
 import asyncpg.exceptions
 
 from aiogram import types
@@ -14,13 +13,12 @@ from states.criteria import FormCriteria
 
 from TEST_TMDB_PIPY import TheMovie
 
-# from config import DB_URI
 from keyboards.default import vote_average
 
 from keyboards.inline.choise_buttons import popular_movie_buttons, menu_, title_movie_buttons, total_keyboard, \
     result_keyboard, title_keyboard, genres_keyboard, start, similar_movie_keyboard, my_movies
 from loader import dp, bot
-from aiogram.types import Message, ParseMode
+from aiogram.types import Message
 
 from aiogram.dispatcher.filters import Command, Text
 
@@ -34,16 +32,19 @@ db = DBCommands()
 
 # =====================================================================================================================
 
-
 # ================ START FUNCTIONS + ADD USER TO DB ====================================================================
 @dp.message_handler(Command('start'))
 async def start_menu(message: Message):
+    """
+
+    :param message:
+    :return: start keyboard and add user info in Users Table
+    """
     user_id = message.from_user.id
     username = message.from_user.first_name
-
     user = await db.add_new_user()  # add user in db
 
-    id = user.id  # For Change lang
+    # id = user.id  # For Change lang
 
     count_users = await db.count_users()  # Count users for admin (in future mb)
     print(count_users)
@@ -55,18 +56,17 @@ async def start_menu(message: Message):
     await message.reply(f'Hello {username}. \nSelect Your Option From Menu 👇', reply_markup=start())
 
 
-
-
 # =====================================================================================================================
 
 
 # ================ MY_MOVIES ==========================================================================================
 
+
 @dp.callback_query_handler(Text(startswith='movie_list'))
 async def movie_list(callback: types.CallbackQuery):
     """
     :param callback:
-    :return:
+    :return: data from MyMovie Table
     """
     try:
         first = int(callback['data'].replace('movie_list_', ''))
@@ -81,8 +81,6 @@ async def movie_list(callback: types.CallbackQuery):
         movie_id = ((re.findall(r'ID: (\d+)', text))[-1])
         print(len(movie))
 
-
-
         await callback.message.edit_text(text=text)
         await callback.message.edit_reply_markup(reply_markup=my_movies(first, len(movie), title, movie_id))
     except IndexError:
@@ -96,7 +94,7 @@ async def add_to_movie_list(callback: types.CallbackQuery):
     """
     Function for add movie to db list
     :param callback:
-    :return:
+    :return: add data in MyMovie Table
     """
     item = MyMovies()
     data = callback.get_current().message.text
@@ -122,13 +120,47 @@ async def add_to_movie_list(callback: types.CallbackQuery):
         await callback.answer(text='This Movie Already In Your List')
 
 
+@dp.callback_query_handler(Text(startswith='delete_from_movie_list'))
+async def drop_my_movie(callback: types.CallbackQuery):
+    """
+
+    :param callback:
+    :return: delete item from MyMovies Table
+    """
+    item = MyMovies()
+
+    data = callback.get_current().message.text
+
+    user_id = int(types.User.get_current())
+    movie_id = int((re.findall(r'ID: (\d+)', data))[-1])
+    title = ((re.findall(r'Movie: (.+)', data))[-1])
+
+    item_id = await db.get_movie(movie_id)
+
+    item.id = item_id.id
+    item.users_id = user_id
+    item.movie_id = movie_id
+    item.title = str(title[-1])
+    item.time = datetime.datetime.now()
+    item.data = data
+
+    await item.delete()
+    await callback.answer(text='Deleted From Your MovieList')
+
+
 # =====================================================================================================================
 
 
 # ================ MOVIES =============================================================================================
 
+
 @dp.callback_query_handler(Text(startswith='movies'))
 async def movies(callback: types.CallbackQuery):
+    """
+
+    :param callback:
+    :return: menu keyboard
+    """
     # For "typing" message in top console
     await bot.send_chat_action(callback.message.chat.id, ChatActions.TYPING)
     await asyncio.sleep(0.5)
@@ -137,11 +169,15 @@ async def movies(callback: types.CallbackQuery):
     await callback.answer()
 
 
-# List Of Popular Movies
 @dp.callback_query_handler(Text(startswith='popular'))
 async def poppular_by(callback: types.CallbackQuery):
+    """
+
+    :param callback:
+    :return: list with popular movies from tmdbv3api
+    """
     popular_list = TheMovie().movie.popular()
-    # print(popular_list)
+
     first = int(callback['data'].replace('popular_', ''))
 
     # Message List
@@ -171,9 +207,16 @@ async def poppular_by(callback: types.CallbackQuery):
         reply_markup=popular_movie_buttons(first, len(popular_list), original_name, id))
 
 
-# Find Movie By Title
+# =====================================================================================================================
+
+
 @dp.callback_query_handler(Text(startswith='title'))
 async def choose_option(callback: types.CallbackQuery):
+    """
+
+    :param callback:
+    :return: request for searching movie by title
+    """
     # For "typing" message in top console
     await bot.send_chat_action(callback.message.chat.id, ChatActions.TYPING)
     await asyncio.sleep(0.5)
@@ -182,10 +225,14 @@ async def choose_option(callback: types.CallbackQuery):
     await callback.message.answer('Enter Title Of Film:')
 
 
-# Find Movie By Title
 @dp.message_handler(state=FormCriteria.title)
 async def find_by_title(message: types.Message, state: FSMContext):
-    # user_id = message.from_user.id
+    """
+
+    :param message:
+    :param state:
+    :return: confirmation request with movie title
+    """
 
     async with state.proxy() as data:
         data['title'] = message.text
@@ -207,11 +254,13 @@ async def find_by_title(message: types.Message, state: FSMContext):
         await state.reset_state()
 
 
-# =====================================================================================================================
+@dp.callback_query_handler(Text(startswith='find'))
+async def title(callback: types.CallbackQuery):
+    """
 
-# Find Movie By Title
-@dp.callback_query_handler(Text(startswith='find'))  # , state=FormCriteria.title)
-async def title(callback: types.CallbackQuery):  # , state: FSMContext):
+    :param callback:
+    :return: list of movies by title
+    """
     try:
         first = int(callback['data'].replace('find_', ''))
 
@@ -219,7 +268,6 @@ async def title(callback: types.CallbackQuery):  # , state: FSMContext):
 
         for i in title:
             print(i)
-
 
         name = i.title
         movie_list = TheMovie().movie.search(name)
@@ -248,9 +296,12 @@ async def title(callback: types.CallbackQuery):  # , state: FSMContext):
         await callback.message.edit_text(text=text_value)
         await callback.message.edit_reply_markup(
             reply_markup=title_movie_buttons(first, len(movie_list), original_name, id))
-    except IndexError as ex:
+    except IndexError:
 
         await callback.message.reply(text='Sorry. No Results', reply_markup=menu_())
+
+
+# =====================================================================================================================
 
 
 @dp.callback_query_handler(Text(startswith='finish'), state=FormCriteria)
@@ -355,6 +406,12 @@ async def process_year_invalid(message: types.Message):
 
 @dp.message_handler(state=FormCriteria.year)
 async def process_year(message: types.Message, state: FSMContext):
+    """
+
+    :param message:
+    :param state:
+    :return: confirmation request search by criteria
+    """
     user_id = message.from_user.id
     async with state.proxy() as data:
         data['year'] = message.text
@@ -387,13 +444,17 @@ async def process_year(message: types.Message, state: FSMContext):
 
 @dp.callback_query_handler(Text(startswith='total'))
 async def total(callback: types.CallbackQuery):
+    """
+
+    :param callback:
+    :return: list of movies by criteria
+    """
     try:
         first = int(callback['data'].replace('total_', ''))
 
         criteria = await db.show_criteria()
         print(criteria)
         for i in criteria:
-
             genre = i.genre
             print(genre)
             voteaverage = i.vote_average
@@ -438,10 +499,13 @@ async def total(callback: types.CallbackQuery):
         await callback.message.reply('Sorry. No Results', reply_markup=menu_())
 
 
+@dp.callback_query_handler(Text(startswith='similar'))
+async def movie_like_this(callback: types.CallbackQuery):
+    """
 
-# Similar Movies
-@dp.callback_query_handler(Text(startswith='similar'))  # , state=FormCriteria)
-async def movie_like_this(callback: types.CallbackQuery):  # state: FSMContext):
+    :param callback:
+    :return: similar movies by move_id
+    """
     try:
 
         # await state.finish()
@@ -481,4 +545,3 @@ async def movie_like_this(callback: types.CallbackQuery):  # state: FSMContext):
             reply_markup=similar_movie_keyboard(first, len(movie_list), original_name, id))
     except IndexError as ex:
         await callback.message.reply('Sorry. No Results', reply_markup=menu_())
-

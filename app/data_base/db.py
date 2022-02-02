@@ -126,6 +126,12 @@ class DBCommands:
         total = await db.func.count(MyMovies.users_id)
         return total
 
+    async def get_movie(self, movie_id):
+        user_id = types.User.get_current().id
+        drop = await MyMovies.query.where(MyMovies.movie_id == movie_id and MyMovies.users_id == user_id).gino.first()
+        return drop
+
+
     ###########################
 
 

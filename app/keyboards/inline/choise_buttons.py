@@ -30,9 +30,9 @@ def my_movies(first, movie, title, movie_id):
     if not first >= movie - 1:
         buttons.append(types.InlineKeyboardButton(text='>', callback_data=f'movie_list_{first + 1}'))
 
-    buttons.append(types.InlineKeyboardButton(text='Back To Movies Option', callback_data='movies'))
+    buttons.append(types.InlineKeyboardButton(text='Back To Search Movies', callback_data='movies'))
 
-    # buttons.append(types.InlineKeyboardButton(text='Add To Movie List', callback_data='add_to_movie_list'))
+    buttons.append(types.InlineKeyboardButton(text='Delete From Movie List', callback_data='delete_from_movie_list'))
 
     buttons.append(types.InlineKeyboardButton(text='Movie Like This', callback_data='similar_0'))
 
@@ -71,7 +71,7 @@ def popular_movie_buttons(first, popular_list, original_name, id):
     if not first >= popular_list - 1:
         buttons.append(types.InlineKeyboardButton(text='>', callback_data=f'popular_{first + 1}'))
 
-    buttons.append(types.InlineKeyboardButton(text='Back To Movies Option', callback_data='movies'))
+    buttons.append(types.InlineKeyboardButton(text='Back To Search Movies', callback_data='movies'))
 
     buttons.append(types.InlineKeyboardButton(text='Add To Movie List', callback_data='add_to_movie_list'))
 
@@ -100,7 +100,7 @@ def similar_movie_keyboard(first, movie_list, original_name, id):
     if not first >= movie_list - 1:
         buttons.append(types.InlineKeyboardButton(text='>', callback_data=f'similar_{first + 1}'))
 
-    buttons.append(types.InlineKeyboardButton(text='Back To Movies Option', callback_data='movies'))
+    buttons.append(types.InlineKeyboardButton(text='Back To Search Movies', callback_data='movies'))
 
     buttons.append(types.InlineKeyboardButton(text='Add To Movie List', callback_data='add_to_movie_list'))
 
@@ -139,7 +139,7 @@ def title_movie_buttons(first, movie_list, original_name, id):
     if not first >= movie_list - 1:
         buttons.append(types.InlineKeyboardButton(text='>', callback_data=f'find_{first + 1}'))
 
-    buttons.append(types.InlineKeyboardButton(text='Back To Movies Option', callback_data='movies'))
+    buttons.append(types.InlineKeyboardButton(text='Back To Search Movies', callback_data='movies'))
 
     buttons.append(types.InlineKeyboardButton(text='Add To Movie List', callback_data='add_to_movie_list'))
 
@@ -177,7 +177,7 @@ def result_keyboard(first, data, original_name, id):
     if not first >= data - 1:
         buttons.append(types.InlineKeyboardButton(text='>', callback_data=f'total_{first + 1}'))
 
-    buttons.append(types.InlineKeyboardButton(text='Back To Movies Option', callback_data='movies'))
+    buttons.append(types.InlineKeyboardButton(text='Back To Search Movies', callback_data='movies'))
 
     buttons.append(types.InlineKeyboardButton(text='Add To Movie List', callback_data='add_to_movie_list'))
 
@@ -214,7 +214,7 @@ def genres_keyboard():
     buttons.append(types.InlineKeyboardButton(text='Western', callback_data='37'))
 
     keyboard = types.InlineKeyboardMarkup(row_width=4)
-    keyboard.insert(types.InlineKeyboardButton(text='Back To Movies Option', callback_data='finish'))
+    keyboard.insert(types.InlineKeyboardButton(text='Back To Search Movies', callback_data='finish'))
     keyboard.add(*buttons)
 
     return keyboard
