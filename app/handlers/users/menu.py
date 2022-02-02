@@ -73,19 +73,20 @@ async def movie_list(callback: types.CallbackQuery):
     data = await db.show_movies()
     movie = []
     for i in data:
-        movie.append(i)
+        movie.append(i.data)
+        title = i.title
+        print(title)
+        id = str(i.movie_id)
+        print(id)
+        data = i.data
 
     # data = dict(movie)
+    print(len(movie))
     print(movie)
 
 
 
 
-        # title = i.title
-        # # print(title)
-        # id = str(i.movie_id)
-        # # print(id)
-        # data = i.data
 
 
     print('------------------')
@@ -94,8 +95,8 @@ async def movie_list(callback: types.CallbackQuery):
 
 
 
-    await callback.message.edit_text(text=i.data)
-    # await callback.message.edit_reply_markup(reply_markup=my_movies(first, len(movie), title, id))
+    await callback.message.edit_text(text=data)
+    await callback.message.edit_reply_markup(reply_markup=my_movies(first, len(movie), title, id))
 
     # await callback.message.reply('It Wll Be Work Soon ✌️')
     await callback.answer()
