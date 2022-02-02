@@ -1,7 +1,9 @@
+import datetime
 import logging
 import re
 
 import aiogram.utils.markdown as md
+import asyncpg.exceptions
 
 from aiogram import types
 from aiogram.dispatcher import FSMContext
@@ -16,7 +18,7 @@ from TEST_TMDB_PIPY import TheMovie
 from keyboards.default import vote_average
 
 from keyboards.inline.choise_buttons import popular_movie_buttons, menu_, title_movie_buttons, total_keyboard, \
-    result_keyboard, title_keyboard, genres_keyboard, start, similar_movie_keyboard
+    result_keyboard, title_keyboard, genres_keyboard, start, similar_movie_keyboard, my_movies
 from loader import dp, bot
 from aiogram.types import Message, ParseMode
 
@@ -53,10 +55,6 @@ async def start_menu(message: Message):
     await message.reply(f'Hello {username}. \nSelect Your Option From Menu 👇', reply_markup=start())
 
 
-@dp.message_handler(lambda message: True, content_types='text')
-async def user_message(message):
-    user_id = message.from_user.id
-    # update_messages_count(user_id)
 
 
 # =====================================================================================================================
@@ -70,7 +68,33 @@ async def movie_list(callback: types.CallbackQuery):
     :param callback:
     :return:
     """
-    await callback.message.reply('It Wll Be Work Soon ✌️')
+    first = int(callback['data'].replace('movie_list_', ''))
+
+    data = await db.show_movies()
+    for num,i in enumerate(data):
+        text = ('<b> {data} </b>')
+
+
+
+
+        # title = i.title
+        # # print(title)
+        # id = str(i.movie_id)
+        # # print(id)
+        # data = i.data
+
+
+        print('------------------')
+
+
+
+
+
+    await callback.message.edit_text(text=text.format(data = i.data))
+    await callback.message.edit_reply_markup(
+        reply_markup=my_movies(first, len(i.data), title, id))
+
+    # await callback.message.reply('It Wll Be Work Soon ✌️')
     await callback.answer()
 
 
@@ -85,17 +109,24 @@ async def add_to_movie_list(callback: types.CallbackQuery):
     data = callback.get_current().message.text
 
     movie_id = (re.findall(r'ID: (\d+)', data))
-    m_id = int(movie_id[-1])
+    m_id = int(movie_id[-1])  # id without quotes
+    print(m_id)
+    title = (re.findall(r'Movie: (.+)', data))
+    print(title[-1])  # text without quotes
 
     user_id = int(types.User.get_current())
 
     item.users_id = user_id
     item.movie_id = m_id
+    item.title = str(title[-1])
+    item.time = datetime.datetime.now()
     item.data = data
 
-    await item.create()
-
-    await callback.answer(text='Added To Your MovieList')
+    try:
+        await item.create()
+        await callback.answer(text='Added To Your MovieList')
+    except asyncpg.exceptions.UniqueViolationError:
+        await callback.answer(text='This Movie Already In Your List')
 
 
 # =====================================================================================================================
@@ -166,10 +197,11 @@ async def find_by_title(message: types.Message, state: FSMContext):
         data['title'] = message.text
 
         item = Title()
-        # user = User()
+
         user_id = types.User.get_current()
         item.title = data['title']
         item.users_id = user_id
+        item.time = datetime.datetime.now()
         await state.update_data(item=item)
 
         data = await state.get_data()
@@ -204,7 +236,7 @@ async def title(callback: types.CallbackQuery):  # , state: FSMContext):
         first = int(callback['data'].replace('find_', ''))
 
         title = await db.show_title()
-        print(title)
+        # print(title)
         for i in title:
             print(i)
 
@@ -352,6 +384,7 @@ async def process_year(message: types.Message, state: FSMContext):
         year = int(message.text)
         item.year = year
         item.users_id = user_id
+        item.time = datetime.datetime.now()
 
         await item.create()
 
@@ -361,7 +394,15 @@ async def process_year(message: types.Message, state: FSMContext):
         await bot.send_chat_action(message.chat.id, ChatActions.TYPING)
         await asyncio.sleep(0.3)
 
-        await message.reply(text=(item.genre, item.vote_average, item.year), reply_markup=total_keyboard())
+        item.year = item.year
+        item.vote_average = item.vote_average
+        item.genre = item.genre
+
+        text = (f'<b> Genre ID: </b>{item.genre}\n'
+                f'<b> Vote Average </b>{item.vote_average}\n'
+                f'<b> Year </b>{item.year}')
+
+        await message.answer(text=text, reply_markup=total_keyboard())
 
         # await bot.send_message(
         #     message.chat.id,
@@ -385,7 +426,6 @@ async def total(callback: types.CallbackQuery):
         criteria = await db.show_criteria()
         print(criteria)
         for i in criteria:
-            # print(i)
 
             genre = i.genre
             print(genre)
@@ -431,52 +471,6 @@ async def total(callback: types.CallbackQuery):
         await callback.message.reply('Sorry. No Results', reply_markup=menu_())
 
 
-# @dp.callback_query_handler(Text(startswith='total'), state=FormCriteria.year)
-# async def total(callback: types.CallbackQuery, state: FSMContext):
-#     try:
-#         async with state.proxy() as data:
-#             first = int(callback['data'].replace('total_', ''))
-#             genre = data['genre']
-#             voteaverage = data['voteaverage']
-#             year = data['year']
-#             # item = Criteria()
-#             # genre = item.genre
-#             # voteaverage = item.vote_average
-#             # year = item.year
-#             movie_list = TheMovie().discover.discover_movies({
-#                 'sort_by': 'popularity.desc',
-#                 'with_genres': f'{genre}',
-#                 'vote_average.gte': f'{voteaverage}',
-#                 'primary_release_year': f'{year}'
-#             })
-#             id = movie_list[first]['id']
-#             genre_ids = movie_list[first]['genre_ids']
-#             original_name = movie_list[first]['title']
-#             original_language = movie_list[first]['original_language']
-#             overview = movie_list[first]['overview']
-#             vote_average = movie_list[first]['vote_average']
-#             vote_count = movie_list[first]['vote_count']
-#             release_date = movie_list[first]['release_date']
-#             popularity = movie_list[first]['popularity']
-#             poster_path = movie_list[first]['poster_path']
-#
-#             text_value = f' ID: {id}\n Movie: {original_name}\n Release date: {release_date}\n Genre id: {genre_ids}\n' \
-#                          f' Original languare {original_language}\n Overwiew: {overview}\n Voteaverage: {vote_average}\n' \
-#                          f' Vote count: {vote_count}\n Popularity: {popularity}\n Genre id: {genre_ids}\n ' \
-#                          f' Poster path: https://image.tmdb.org/t/p/original{poster_path}\n' \
-#                          f'------------------------------------------------------------------------------------------'
-#
-#             # For "typing" message in top console
-#             await bot.send_chat_action(callback.message.chat.id, ChatActions.TYPING)
-#             await asyncio.sleep(0.25)
-#
-#             await callback.message.edit_text(text=text_value)
-#             await callback.message.edit_reply_markup(
-#                 reply_markup=result_keyboard(first, len(movie_list), original_name, id))
-#     except IndexError as ex:
-#         await state.finish()
-#         await callback.message.reply('Sorry. No Results', reply_markup=menu_())
-
 
 # Similar Movies
 @dp.callback_query_handler(Text(startswith='similar'))  # , state=FormCriteria)
@@ -519,6 +513,5 @@ async def movie_like_this(callback: types.CallbackQuery):  # state: FSMContext):
         await callback.message.edit_reply_markup(
             reply_markup=similar_movie_keyboard(first, len(movie_list), original_name, id))
     except IndexError as ex:
-        # await state.finish()
         await callback.message.reply('Sorry. No Results', reply_markup=menu_())
 

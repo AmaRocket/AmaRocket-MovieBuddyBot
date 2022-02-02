@@ -4,9 +4,39 @@ from aiogram import types
 def start():
     buttons = [
         types.InlineKeyboardButton(text='Search Movies', callback_data='movies'),
-        types.InlineKeyboardButton(text='My Movie List', callback_data='movie_list')
+        types.InlineKeyboardButton(text='My Movie List', callback_data='movie_list_0')
     ]
     keyboard = types.InlineKeyboardMarkup()
+    keyboard.add(*buttons)
+    return keyboard
+
+def my_movies(first, data, title, id):
+
+    buttons = []
+
+    buttons.append(types.InlineKeyboardButton(
+        text='Trailer YouTube',
+        url=f'https://www.youtube.com/results?search_query=+{title}+trailer'
+    ))
+
+    buttons.append(types.InlineKeyboardButton(
+        text='More Info On TMDB',
+        url=f'https://www.themoviedb.org/movie/{id}'
+    ))
+
+    if not first <= 0:
+        buttons.append(types.InlineKeyboardButton(text='<', callback_data=f'movie_list_{first - 1}'))
+
+    if not first >= data:
+        buttons.append(types.InlineKeyboardButton(text='>', callback_data=f'movie_list_{first + 1}'))
+
+    buttons.append(types.InlineKeyboardButton(text='Back To Movies Option', callback_data='movies'))
+
+    buttons.append(types.InlineKeyboardButton(text='Add To Movie List', callback_data='add_to_movie_list'))
+
+    buttons.append(types.InlineKeyboardButton(text='Movie Like This', callback_data='similar_0'))
+
+    keyboard = types.InlineKeyboardMarkup(row_width=2)
     keyboard.add(*buttons)
     return keyboard
 

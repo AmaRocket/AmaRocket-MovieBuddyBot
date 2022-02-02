@@ -1,7 +1,7 @@
 from aiogram import types, Bot
 from gino import Gino
 from sqlalchemy import (Column, Integer, BigInteger, String,
-                        Sequence, TIMESTAMP, Boolean, JSON, ForeignKey)
+                        Sequence, DateTime, Boolean, JSON, ForeignKey)
 from sqlalchemy import sql
 from gino.schema import GinoSchemaVisitor
 
@@ -31,8 +31,8 @@ class Title(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     users_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
-    title = db.Column(db.String)
-    time = db.Column(TIMESTAMP)
+    title = db.Column(db.DateTime())
+    time = db.Column(db.DateTime())
 
     def __repr__(self):
         return "<Title(id='{}', users_id='{}', title='{}', time='{}')>".format(
@@ -48,7 +48,7 @@ class Criteria(db.Model):
     genre = db.Column(db.Integer)
     vote_average = db.Column(db.Integer)
     year = db.Column(db.Integer)
-    time = db.Column(TIMESTAMP)
+    time = db.Column(db.DateTime())
 
     def __repr__(self):
         return "<Title(id='{}', users_id='{}', genre='{}', vote_average='{}', year='{}', time='{}')>".format(
@@ -62,8 +62,11 @@ class MyMovies(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     users_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
     movie_id = db.Column(db.Integer)
-    time = db.Column(TIMESTAMP)
+    title = db.Column(db.String(255))
+    time = db.Column(db.DateTime())
     data = db.Column(db.Text)
+
+    __tableargs__ = (db.UniqueConstraint('users_id', 'movie_id'))
 
     def __repr__(self):
         return "<MyMovies(id='{}', users_id='{}', movie_id='{}', time='{}', data='{}')>".format(
@@ -99,21 +102,26 @@ class DBCommands:
         await user.update(language=language).apply()
 
     ###########################
-    async def add_movie(self):
-        user = types.User.get_current()
-        pass
 
     async def show_title(self):
-        title = await Title.query.gino.all()
+        user_id = types.User.get_current().id
+        title = await Title.query.where(Title.users_id == user_id).gino.all()
         return title
 
     async def show_criteria(self):
-        criteria = await Criteria.query.gino.all()
+        user_id = types.User.get_current().id
+        criteria = await Criteria.query.where(Criteria.users_id == user_id).gino.all()
         return criteria
 
     async def show_movies(self):
-        my_movies = await MyMovies.query.gino.all()
+        user_id = types.User.get_current().id
+        my_movies = await MyMovies.query.where(MyMovies.users_id == user_id).gino.all()
         return my_movies
+
+    async def count_moviess(self):
+        user_id = types.User.get_current().id
+        total = await db.func.count(MyMovies.users_id)
+        return total
 
     ###########################
 
