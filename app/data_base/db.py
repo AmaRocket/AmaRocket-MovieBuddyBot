@@ -31,7 +31,7 @@ class Title(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     users_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
-    title = db.Column(db.DateTime())
+    title = db.Column(db.String)
     time = db.Column(db.DateTime())
 
     def __repr__(self):

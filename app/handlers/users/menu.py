@@ -2,7 +2,7 @@ import datetime
 import logging
 import re
 
-import aiogram.utils.markdown as md
+
 import asyncpg.exceptions
 
 from aiogram import types
@@ -212,19 +212,6 @@ async def find_by_title(message: types.Message, state: FSMContext):
 
         await state.reset_state()
 
-        # await bot.send_message(
-        #     message.chat.id,
-        #     md.text(
-        #         md.text('Title is: ', md.bold(data['title'])),
-        #         sep='\n',
-        #     ),
-        #     parse_mode=ParseMode.MARKDOWN_V2,
-        #     reply_markup=title_keyboard()
-        # )
-        #
-        #
-        #
-
 
 # =====================================================================================================================
 
@@ -232,15 +219,14 @@ async def find_by_title(message: types.Message, state: FSMContext):
 @dp.callback_query_handler(Text(startswith='find'))  # , state=FormCriteria.title)
 async def title(callback: types.CallbackQuery):  # , state: FSMContext):
     try:
-        # async with state.proxy() as data:
         first = int(callback['data'].replace('find_', ''))
 
         title = await db.show_title()
-        # print(title)
+
         for i in title:
             print(i)
 
-        # name = data['title']
+
         name = i.title
         movie_list = TheMovie().movie.search(name)
 
@@ -269,8 +255,8 @@ async def title(callback: types.CallbackQuery):  # , state: FSMContext):
         await callback.message.edit_reply_markup(
             reply_markup=title_movie_buttons(first, len(movie_list), original_name, id))
     except IndexError as ex:
-        # await state.finish()
-        await callback.message.reply('Sorry. No Results', reply_markup=menu_())
+
+        await callback.message.reply(text='Sorry. No Results', reply_markup=menu_())
 
 
 @dp.callback_query_handler(Text(startswith='finish'), state=FormCriteria)
@@ -403,19 +389,6 @@ async def process_year(message: types.Message, state: FSMContext):
                 f'<b> Year </b>{item.year}')
 
         await message.answer(text=text, reply_markup=total_keyboard())
-
-        # await bot.send_message(
-        #     message.chat.id,
-        #     md.text(
-        #         md.text('Genre is: ', md.bold(data['genre'])),
-        #         md.text('Minimum Vote Average:', md.code(data['voteaverage'])),
-        #         md.text('Minimum Year:', data['year']),
-        #         sep='\n',
-        #     ),
-        #     parse_mode=ParseMode.MARKDOWN_V2,
-        #     reply_markup=total_keyboard()
-        # )
-        # print(item.genre, item.vote_average, item.year)
 
 
 @dp.callback_query_handler(Text(startswith='total'))

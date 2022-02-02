@@ -8,6 +8,8 @@ This Telegram Bot can help to find movies by criteria as like:
 - vote average
 - release year
 
+Search movies by title.
+
 You can find info about popular films on **TMDB**. This list refreshes every day.
 
 Also, you can watch info on **TMDB** site, and watch trailers on **YouTube**.
