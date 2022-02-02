@@ -68,37 +68,26 @@ async def movie_list(callback: types.CallbackQuery):
     :param callback:
     :return:
     """
-    first = int(callback['data'].replace('movie_list_', ''))
+    try:
+        first = int(callback['data'].replace('movie_list_', ''))
 
-    data = await db.show_movies()
-    movie = []
-    for i in data:
-        movie.append(i.data)
-        title = i.title
-        print(title)
-        id = str(i.movie_id)
-        print(id)
-        data = i.data
+        data = await db.show_movies()
+        movie = []
+        for i in data:
+            movie.append(i.data)
 
-    # data = dict(movie)
-    print(len(movie))
-    print(movie)
+        text = movie[first]  # Get message data from db
+        title = ((re.findall(r'Movie: (.+)', text))[-1])
+        movie_id = ((re.findall(r'ID: (\d+)', text))[-1])
+        print(len(movie))
 
 
 
+        await callback.message.edit_text(text=text)
+        await callback.message.edit_reply_markup(reply_markup=my_movies(first, len(movie), title, movie_id))
+    except IndexError:
+        await callback.answer(text='Your Movie List Is Empty')
 
-
-
-    print('------------------')
-
-
-
-
-
-    await callback.message.edit_text(text=data)
-    await callback.message.edit_reply_markup(reply_markup=my_movies(first, len(movie), title, id))
-
-    # await callback.message.reply('It Wll Be Work Soon ✌️')
     await callback.answer()
 
 

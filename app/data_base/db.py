@@ -1,3 +1,5 @@
+import datetime
+
 from aiogram import types, Bot
 from gino import Gino
 from sqlalchemy import (Column, Integer, BigInteger, String,
@@ -19,10 +21,11 @@ class User(db.Model):
     language = db.Column(db.String)
     first_name = db.Column(db.String)
     username = db.Column(db.String)
+    time = db.Column(db.DateTime())
 
     def __repr__(self):
-        return "<User(id='{}', users_id='{}', first_name='{}', username='{}')>".format(
-            self.id, self.users_id, self.first_name, self.username)
+        return "<User(id='{}', users_id='{}', first_name='{}', username='{}', time='{}')>".format(
+            self.id, self.users_id, self.first_name, self.username, self.time)
 
 
 class Title(db.Model):
@@ -62,7 +65,6 @@ class MyMovies(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     users_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
     movie_id = db.Column(db.Integer)
-    title = db.Column(db.String(255))
     time = db.Column(db.DateTime())
     data = db.Column(db.Text)
 
@@ -87,6 +89,7 @@ class DBCommands:
         new_user.user_id = user.id
         new_user.username = user.username
         new_user.first_name = user.first_name
+        new_user.time = datetime.datetime.now()
 
         await new_user.create()
         return new_user
@@ -131,5 +134,5 @@ async def create_db():
 
     # Create tables
     db.gino: GinoSchemaVisitor
-    # await db.gino.drop_all()
+    # await db.gino.drop_all()   # DROPPING DB
     await db.gino.create_all()
