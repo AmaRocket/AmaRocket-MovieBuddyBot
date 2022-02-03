@@ -46,7 +46,7 @@ async def start_menu(message: Message):
 
     with open('photo_2022-02-03_01-21-05.jpg', 'rb') as img:
         await bot.send_photo(message.chat.id, img,
-                             caption=f'<b>Hello {username}!\nBuddy I Can Help U With:\n\n🔍 🔸 To Find A Movie \n\n'
+                             caption=f'<b>Hello {username}!\nBuddy I Can Help U With:\n\n🔍 🔸 Find A Movie \n\n'
                                      f'📝 🔸 Add It Your Movie List \n\n'
                                      f'📺 🔸 Watch Trailer On YouTube  \n\nℹ 🔸 Watch Info On TMDB ️\n\n'
                                      f'⚡ 🔸 And Yes! I Am Powered By TMDB󠁴</b>', reply_markup=starting())

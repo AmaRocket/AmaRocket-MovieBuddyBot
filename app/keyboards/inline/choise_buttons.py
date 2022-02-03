@@ -63,7 +63,7 @@ def menu_():
 
 
 # Inline buttons for a message with a popular movies.
-def popular_movie_buttons(first, popular_list, original_name, id):
+def popular_movie_buttons(first, popular_list, original_name, movie_id):
     buttons = []
     buttons.append(types.InlineKeyboardButton(
         text='📺 Trailer YouTube',
@@ -72,7 +72,7 @@ def popular_movie_buttons(first, popular_list, original_name, id):
 
     buttons.append(types.InlineKeyboardButton(
         text='ℹ️ More Info On TMDB',
-        url=f'https://www.themoviedb.org/movie/{id}'
+        url=f'https://www.themoviedb.org/movie/{movie_id}'
     ))
 
     if not first <= 0:
@@ -94,7 +94,7 @@ def popular_movie_buttons(first, popular_list, original_name, id):
     return keyboard
 
 
-def similar_movie_keyboard(first, movie_list, original_name, id):
+def similar_movie_keyboard(first, movie_list, original_name, movie_id):
     buttons = []
     buttons.append(types.InlineKeyboardButton(
         text='📺 Trailer YouTube',
@@ -103,7 +103,7 @@ def similar_movie_keyboard(first, movie_list, original_name, id):
 
     buttons.append(types.InlineKeyboardButton(
         text='ℹ️ More Info On TMDB',
-        url=f'https://www.themoviedb.org/movie/{id}'
+        url=f'https://www.themoviedb.org/movie/{movie_id}'
     ))
 
     if not first <= 0:
@@ -134,7 +134,7 @@ def title_keyboard():
 
 
 # Inline buttons for a message (find_by_title).
-def title_movie_buttons(first, movie_list, original_name, id):
+def title_movie_buttons(first, movie_list, original_name, movie_id):
     buttons = []
 
     buttons.append(types.InlineKeyboardButton(
@@ -144,7 +144,7 @@ def title_movie_buttons(first, movie_list, original_name, id):
 
     buttons.append(types.InlineKeyboardButton(
         text='ℹ️ More Info On TMDB',
-        url=f'https://www.themoviedb.org/movie/{id}'
+        url=f'https://www.themoviedb.org/movie/{movie_id}'
     ))
 
     if not first <= 0:
@@ -174,7 +174,7 @@ def total_keyboard():
     return keyboard
 
 
-def result_keyboard(first, data, original_name, id):
+def result_keyboard(first, data, original_name, movie_id):
     buttons = []
 
     buttons.append(types.InlineKeyboardButton(
@@ -184,7 +184,7 @@ def result_keyboard(first, data, original_name, id):
 
     buttons.append(types.InlineKeyboardButton(
         text='ℹ️ More Info On TMDB',
-        url=f'https://www.themoviedb.org/movie/{id}'
+        url=f'https://www.themoviedb.org/movie/{movie_id}'
     ))
 
     if not first <= 0:
