@@ -10,7 +10,7 @@ def starting():
 
 def start():
     buttons = [
-        types.InlineKeyboardButton(text='🎬 Search Movies', callback_data='movies'),
+        types.InlineKeyboardButton(text='🎬 Find Movies', callback_data='movies'),
         types.InlineKeyboardButton(text='🍿 My Movie List', callback_data='movie_list_0')
     ]
     keyboard = types.InlineKeyboardMarkup()
@@ -52,12 +52,12 @@ def my_movies(first, movie, title, movie_id):
 
 def menu_():
     buttons = [
-        types.InlineKeyboardButton(text='Popular Movies List', callback_data='popular_0'),
-        types.InlineKeyboardButton(text='Find Film By Title', callback_data='title_0'),
-        types.InlineKeyboardButton(text='Find Film By Criteria', callback_data='criteria_0'),
+        types.InlineKeyboardButton(text='🔍 Popular List', callback_data='popular_0'),
+        types.InlineKeyboardButton(text='🔍 By Title', callback_data='title_0'),
+        types.InlineKeyboardButton(text='🔍 By Criteria', callback_data='criteria_0'),
         types.InlineKeyboardButton(text='Ⓜ Back To Menu', callback_data='go')
     ]
-    keyboard = types.InlineKeyboardMarkup(row_width=2)
+    keyboard = types.InlineKeyboardMarkup(row_width=3)
     keyboard.add(*buttons)
     return keyboard
 

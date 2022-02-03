@@ -1,9 +1,8 @@
 import datetime
 
-from aiogram import types, Bot
+from aiogram import types
 from gino import Gino
-from sqlalchemy import (Column, Integer, BigInteger, String,
-                        Sequence, DateTime, Boolean, JSON, ForeignKey)
+
 from sqlalchemy import sql
 from gino.schema import GinoSchemaVisitor
 
