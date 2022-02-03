@@ -36,7 +36,6 @@ async def movie_list(callback: types.CallbackQuery):
 
     try:
         first = int(callback['data'].replace('movie_list_', ''))
-
         data = await db.show_movies()
         movie = []
         for i in data:
@@ -66,17 +65,16 @@ async def add_to_movie_list(callback: types.CallbackQuery):
     item = MyMovies()
     data = callback.get_current().message.text
 
-    movie_id = (re.findall(r'ID: (\d+)', data))
-    m_id = int(movie_id[-1])  # id without quotes
-    print(m_id)
-    title = (re.findall(r'Movie: (.+)', data))
-    print(title[-1])  # text without quotes
+    movie_id = int((re.findall(r'ID: (\d+)', data))[-1])
+
+    title = str((re.findall(r'Movie: (.+)', data))[-1])
+
 
     user_id = int(types.User.get_current())
 
     item.users_id = user_id
-    item.movie_id = m_id
-    item.title = str(title[-1])
+    item.movie_id = movie_id
+    item.title = title
     item.time = datetime.datetime.now()
     item.data = data
 

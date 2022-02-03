@@ -31,7 +31,7 @@ async def start_menu(message: Message):
     :param message:
     :return: start keyboard and add user info in Users Table
     """
-    user_id = message.from_user.id
+
     username = message.from_user.first_name
     user = await db.add_new_user()  # add user in db
 

@@ -1,4 +1,3 @@
-
 from aiogram import types
 from aiogram.dispatcher.filters import Text
 
@@ -9,8 +8,6 @@ from loader import dp, bot
 
 import asyncio
 from aiogram.types import ChatActions
-
-
 
 # ================ POPULAR ============================================================================================
 from message_output.message_output import MessageText
@@ -40,6 +37,5 @@ async def poppular_by(callback: types.CallbackQuery):
     await callback.message.edit_text(text=text_value)
     await callback.message.edit_reply_markup(
         reply_markup=popular_movie_buttons(first, len(movie_list), original_name, movie_id))
-
 
 # =====================================================================================================================

@@ -3,7 +3,7 @@ import datetime
 from aiogram import types
 from gino import Gino
 
-from sqlalchemy import sql
+from sqlalchemy import sql, desc
 from gino.schema import GinoSchemaVisitor
 
 from config import PG_PASS, PG_USER, PGHOST, DB_NAME
@@ -117,19 +117,14 @@ class DBCommands:
 
     async def show_movies(self):
         user_id = types.User.get_current().id
-        my_movies = await MyMovies.query.where(MyMovies.users_id == user_id).gino.all()
+        my_movies = await MyMovies.query.where(MyMovies.users_id == user_id).order_by(desc(MyMovies.id)).gino.all()
         return my_movies
 
-    async def count_moviess(self):
-        user_id = types.User.get_current().id
-        total = await db.func.count(MyMovies.users_id)
-        return total
 
     async def get_movie(self, movie_id):
         user_id = types.User.get_current().id
         drop = await MyMovies.query.where(MyMovies.movie_id == movie_id and MyMovies.users_id == user_id).gino.first()
         return drop
-
 
     ###########################
 

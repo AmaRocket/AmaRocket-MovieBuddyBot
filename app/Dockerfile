@@ -1,4 +1,4 @@
-ROM alpine:3.14
+FROM alpine:3.14
 
 #ARG bot_token
 #ENV TOKEN=$bot_token
