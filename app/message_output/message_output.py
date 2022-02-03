@@ -1,5 +1,8 @@
-
 class MessageText:
+    """
+    this class made for outputting info
+    about movie from tmdbv3api.
+    """
 
     def message(self, movie_list, first):
         id = movie_list[first]['id']
@@ -20,5 +23,3 @@ class MessageText:
                      f'------------------------------------------------------------------------------------------'
 
         return text_value
-
-
