@@ -16,7 +16,7 @@ from TEST_TMDB_PIPY import TheMovie
 from keyboards.default import vote_average
 
 from keyboards.inline.choise_buttons import popular_movie_buttons, menu_, title_movie_buttons, total_keyboard, \
-    result_keyboard, title_keyboard, genres_keyboard, start, similar_movie_keyboard, my_movies
+    result_keyboard, title_keyboard, genres_keyboard, start, similar_movie_keyboard, my_movies, starting
 from loader import dp, bot
 from aiogram.types import Message
 
@@ -53,7 +53,17 @@ async def start_menu(message: Message):
     await bot.send_chat_action(message.chat.id, ChatActions.TYPING)
     await asyncio.sleep(1)
 
-    await message.reply(f'Hello {username}. \nSelect Your Option From Menu 👇', reply_markup=start())
+    with open('photo_2022-02-03_01-21-05.jpg', 'rb') as img:
+        await bot.send_photo(message.chat.id, img,
+                             caption=f'<b>Hello {username}!\nBuddy I Can Help U With:\n🔍 🔸 To Find A Movie \n'
+                                     f'📝 🔸 Add It Your Movie List \n'
+                                     f'📺 🔸 Watch Trailer On YouTube  \nℹ 🔸 Watch Info On TMDB ️\n'
+                                     f'⚡ 🔸 And Yes! I Am Powered By TMDB󠁴</b>', reply_markup=starting())
+
+
+@dp.callback_query_handler(Text(equals='go', ignore_case=True))
+async def starter(callback: types.CallbackQuery):
+    await callback.message.reply('Find Movie Or Check Your Movie List 👇', reply_markup=start())
 
 
 # =====================================================================================================================
@@ -77,6 +87,7 @@ async def movie_list(callback: types.CallbackQuery):
             movie.append(i.data)
 
         text = movie[first]  # Get message data from db
+        print(text)
         title = ((re.findall(r'Movie: (.+)', text))[-1])
         movie_id = ((re.findall(r'ID: (\d+)', text))[-1])
         print(len(movie))
