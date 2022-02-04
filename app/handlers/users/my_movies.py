@@ -13,7 +13,10 @@ from loader import dp, bot
 import asyncio
 from aiogram.types import ChatActions
 
+from message_output.message_output import MessageText
+
 # ================ DATA BASE SETTINGS =================================================================================
+
 
 db = DBCommands()
 
@@ -43,9 +46,8 @@ async def movie_list(callback: types.CallbackQuery):
 
         text = movie[first]  # Get message data from db
 
-        original_name = ((re.findall(r'Movie: (.+)', text))[-1])
-        movie_id = ((re.findall(r'ID: (\d+)', text))[-1])
-        print(len(movie))
+        original_name = MessageText.original_title(text)
+        movie_id = MessageText.movie_id(text)
 
         await callback.message.edit_text(text=text)
         await callback.message.edit_reply_markup(reply_markup=my_movies(first, len(movie), original_name, movie_id))
@@ -68,7 +70,6 @@ async def add_to_movie_list(callback: types.CallbackQuery):
     movie_id = int((re.findall(r'ID: (\d+)', data))[-1])
 
     title = str((re.findall(r'Movie: (.+)', data))[-1])
-
 
     user_id = int(types.User.get_current())
 

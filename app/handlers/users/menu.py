@@ -33,7 +33,7 @@ async def start_menu(message: Message):
     """
 
     username = message.from_user.first_name
-    user = await db.add_new_user()  # add user in db
+
 
     # id = user.id  # For Change lang
 
@@ -43,6 +43,8 @@ async def start_menu(message: Message):
     # For "typing" message in top console
     await bot.send_chat_action(message.chat.id, ChatActions.TYPING)
     await asyncio.sleep(1)
+
+    await db.add_new_user()  # add user in db
 
     with open('photo_2022-02-03_01-21-05.jpg', 'rb') as img:
         await bot.send_photo(message.chat.id, img,

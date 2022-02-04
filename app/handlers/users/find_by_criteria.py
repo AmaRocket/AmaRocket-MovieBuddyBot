@@ -1,5 +1,4 @@
 import datetime
-import re
 
 from aiogram import types
 from aiogram.dispatcher import FSMContext
@@ -90,8 +89,8 @@ async def process_voteaverage(message: types.Message, state: FSMContext):
 
     data = await state.get_data()
     item: Criteria = data.get('item')
-    vote_average = int(message.text)
-    item.vote_average = vote_average
+    voteaverage = int(message.text)
+    item.vote_average = voteaverage
     await state.update_data(item=item)
 
     await message.answer("What is the Year?", reply_markup=types.ReplyKeyboardRemove())
@@ -138,7 +137,8 @@ async def process_year(message: types.Message, state: FSMContext):
 
         text = (f'<b> Genre ID: </b>{item.genre}\n'
                 f'<b> Vote Average </b>{item.vote_average}\n'
-                f'<b> Year </b>{item.year}')
+                f'<b> Year </b>{item.year}\n'
+                )
 
         await message.answer(text=text, reply_markup=total_keyboard())
 
@@ -171,12 +171,10 @@ async def total(callback: types.CallbackQuery):
             'primary_release_year': f'{year}'
         })
 
-        text_value = MessageText().message(movie_list, first)
+        text_value = MessageText.message(movie_list, first)
 
-        original_name = ((re.findall(r'Movie: (.+)', text_value))[-1])
-        print(original_name)
-        movie_id = ((re.findall(r'ID: (\d+)', text_value))[-1])
-        print(movie_id)
+        original_name = MessageText.original_title(text_value)
+        movie_id = MessageText.movie_id(text_value)
 
         # For "typing" message in top console
         await bot.send_chat_action(callback.message.chat.id, ChatActions.TYPING)

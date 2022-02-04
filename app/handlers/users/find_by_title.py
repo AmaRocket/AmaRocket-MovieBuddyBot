@@ -1,5 +1,4 @@
 import datetime
-import re
 
 from aiogram import types
 from aiogram.dispatcher import FSMContext
@@ -82,21 +81,18 @@ async def title(callback: types.CallbackQuery):
     try:
         first = int(callback['data'].replace('find_', ''))
 
-        title = await db.show_title()
+        movie_title = await db.show_title()
 
         i = str()
-        for index in title:
+        for index in movie_title:
             i = index
 
         name = i.title
         movie_list = TheMovie().movie.search(name)
 
-        text_value = MessageText().message(movie_list, first)
-
-        original_name = ((re.findall(r'Movie: (.+)', text_value))[-1])
-        print(original_name)
-        movie_id = ((re.findall(r'ID: (\d+)', text_value))[-1])
-        print(movie_id)
+        text_value = MessageText.message(movie_list, first)
+        original_name = MessageText.original_title(text_value)
+        movie_id = MessageText.movie_id(text_value)
 
         # For "typing" message in top console
         await bot.send_chat_action(callback.message.chat.id, ChatActions.TYPING)
