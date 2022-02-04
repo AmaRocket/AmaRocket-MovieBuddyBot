@@ -28,12 +28,17 @@ async def movie_like_this(callback: types.CallbackQuery):
 
         movie_id = ((re.findall(r'ID: (\d+)', message))[-1])
 
+
         movie_list = TheMovie().movie.recommendations(movie_id)
         first = int(callback['data'].replace('similar_', ''))
 
         text_value = MessageText().message(movie_list, first)
 
-        original_name = text_value[2]
+        original_name = ((re.findall(r'Movie: (.+)', text_value))[-1])
+        print(original_name)
+        movie_id = ((re.findall(r'ID: (\d+)', text_value))[-1])
+        print(movie_id)
+
 
         # For "typing" message in top console
         await bot.send_chat_action(callback.message.chat.id, ChatActions.TYPING)

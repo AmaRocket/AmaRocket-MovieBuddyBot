@@ -43,12 +43,12 @@ async def movie_list(callback: types.CallbackQuery):
 
         text = movie[first]  # Get message data from db
 
-        title = ((re.findall(r'Movie: (.+)', text))[-1])
+        original_name = ((re.findall(r'Movie: (.+)', text))[-1])
         movie_id = ((re.findall(r'ID: (\d+)', text))[-1])
         print(len(movie))
 
         await callback.message.edit_text(text=text)
-        await callback.message.edit_reply_markup(reply_markup=my_movies(first, len(movie), title, movie_id))
+        await callback.message.edit_reply_markup(reply_markup=my_movies(first, len(movie), original_name, movie_id))
     except IndexError:
         await callback.answer(text='Your Movie List Is Empty')
 
