@@ -1,4 +1,5 @@
 import datetime
+from asyncio import sleep
 
 from aiogram import types
 from aiogram.dispatcher import FSMContext
@@ -65,7 +66,9 @@ async def find_by_title(message: types.Message, state: FSMContext):
         item: Title = data.get('item')
 
         await item.create()
-
+        img = open('./media/futurama-fry-gif-wallpaper-futurama-1668529063.jpg', 'rb')
+        await bot.send_photo(message.chat.id, photo=img)
+        await sleep(1)
         await message.reply(text=item.title, reply_markup=title_keyboard())
 
         await state.reset_state()

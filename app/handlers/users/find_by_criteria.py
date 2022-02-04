@@ -1,4 +1,5 @@
 import datetime
+from asyncio import sleep
 
 from aiogram import types
 from aiogram.dispatcher import FSMContext
@@ -139,6 +140,10 @@ async def process_year(message: types.Message, state: FSMContext):
                 f'<b> Vote Average </b>{item.vote_average}\n'
                 f'<b> Year </b>{item.year}\n'
                 )
+
+        img = open('./media/futurama-fry-gif-wallpaper-futurama-1668529063.jpg', 'rb')
+        await bot.send_photo(message.chat.id, photo=img)
+        await sleep(1)
 
         await message.answer(text=text, reply_markup=total_keyboard())
 
