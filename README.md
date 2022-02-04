@@ -18,7 +18,8 @@ Also, you can watch info on **TMDB** site, and watch trailers on **YouTube**.
 
 - Run **app.py** for using this Bot 
 - All configurations in file **config.py**
-- Tokens and Keys for **configurations** are stored in a file **.env**
+- Tokens, DB-Info and Keys for **configurations** are stored in a file **.env**
+- Postgreql is used as a DB with Gino ORM
 
 **[Telegram link](https://t.me/IFITWILLWORKILEAVETHISNAMEOFBOT)**
 
