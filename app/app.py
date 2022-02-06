@@ -1,5 +1,5 @@
 from loader import bot
-from data_base import db
+from database import db
 
 async def on_startup(_):
     print('GO GO GO')

@@ -1,7 +1,7 @@
 from aiogram import types
 from aiogram.dispatcher.filters import Text
 
-from TEST_TMDB_PIPY import TheMovie
+from tmdb_v3_api import TheMovie
 
 from keyboards.inline.choise_buttons import popular_movie_buttons
 from loader import dp, bot

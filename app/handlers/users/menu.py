@@ -3,7 +3,7 @@ import logging
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 
-from data_base.db import DBCommands
+from database.db import DBCommands
 
 from states.criteria import FormCriteria
 
@@ -46,7 +46,7 @@ async def start_menu(message: Message):
 
     await db.add_new_user()  # add user in db
 
-    with open('./media/photo_2022-02-03_01-21-05.jpg', 'rb') as img:
+    with open('../media/photo_2022-02-03_01-21-05.jpg', 'rb') as img:
         await bot.send_photo(message.chat.id, img,
                              caption=f'<b>Hello {username}!\nBuddy I Can Help U With:\n\n🔍 🔸 Find A Movie \n\n'
                                      f'📝 🔸 Add It Your Movie List \n\n'

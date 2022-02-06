@@ -5,8 +5,8 @@ from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
 
-from TEST_TMDB_PIPY import TheMovie
-from data_base.db import DBCommands, Criteria
+from tmdb_v3_api import TheMovie
+from database.db import DBCommands, Criteria
 from keyboards.default import vote_average
 
 from keyboards.inline.choise_buttons import menu_, genres_keyboard, total_keyboard, result_keyboard
@@ -141,7 +141,7 @@ async def process_year(message: types.Message, state: FSMContext):
                 f'<b> Year </b>{item.year}\n'
                 )
 
-        img = open('./media/futurama-fry-gif-wallpaper-futurama-1668529063.jpg', 'rb')
+        img = open('../media/futurama-fry-gif-wallpaper-futurama-1668529063.jpg', 'rb')
         await bot.send_photo(message.chat.id, photo=img)
         await sleep(1)
 

@@ -23,4 +23,4 @@ Also, you can watch info on **TMDB** site, and watch trailers on **YouTube**.
 
 **[Telegram link](https://t.me/IFITWILLWORKILEAVETHISNAMEOFBOT)**
 
-![preview](app/preview.gif)
+![preview](media/preview.gif)

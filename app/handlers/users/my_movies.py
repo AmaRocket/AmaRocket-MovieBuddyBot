@@ -6,7 +6,7 @@ from aiogram.dispatcher.filters import Text
 
 import asyncpg.exceptions
 
-from data_base.db import DBCommands, MyMovies
+from database.db import DBCommands, MyMovies
 from keyboards.inline.choise_buttons import my_movies
 from loader import dp, bot
 

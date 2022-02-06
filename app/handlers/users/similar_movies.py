@@ -3,7 +3,7 @@ import re
 from aiogram import types
 from aiogram.dispatcher.filters import Text
 
-from TEST_TMDB_PIPY import TheMovie
+from tmdb_v3_api import TheMovie
 
 from keyboards.inline.choise_buttons import similar_movie_keyboard, menu_
 from loader import dp, bot

@@ -5,8 +5,8 @@ from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
 
-from TEST_TMDB_PIPY import TheMovie
-from data_base.db import Title, DBCommands
+from tmdb_v3_api import TheMovie
+from database.db import Title, DBCommands
 
 from keyboards.inline.choise_buttons import title_keyboard, title_movie_buttons, menu_
 from loader import dp, bot
@@ -66,7 +66,7 @@ async def find_by_title(message: types.Message, state: FSMContext):
         item: Title = data.get('item')
 
         await item.create()
-        img = open('./media/futurama-fry-gif-wallpaper-futurama-1668529063.jpg', 'rb')
+        img = open('../media/futurama-fry-gif-wallpaper-futurama-1668529063.jpg', 'rb')
         await bot.send_photo(message.chat.id, photo=img)
         await sleep(1)
         await message.reply(text=item.title, reply_markup=title_keyboard())
