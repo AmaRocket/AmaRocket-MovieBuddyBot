@@ -89,6 +89,7 @@ class DBCommands:
         new_user.username = user.username
         new_user.first_name = user.first_name
         new_user.time = datetime.datetime.now()
+        new_user.language = user.language_code
 
         await new_user.create()
         return new_user
