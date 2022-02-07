@@ -2,11 +2,10 @@ import datetime
 
 from aiogram import types
 from gino import Gino
-
-from sqlalchemy import sql, desc
 from gino.schema import GinoSchemaVisitor
+from sqlalchemy import desc, sql
 
-from config import PG_PASS, PG_USER, PGHOST, DB_NAME
+from config import DB_NAME, PG_PASS, PG_USER, PGHOST
 
 db = Gino()
 
@@ -24,7 +23,8 @@ class User(db.Model):
 
     def __repr__(self):
         return "<User(id='{}', users_id='{}', first_name='{}', username='{}', time='{}')>".format(
-            self.id, self.users_id, self.first_name, self.username, self.time)
+            self.id, self.users_id, self.first_name, self.username, self.time
+        )
 
 
 class Title(db.Model):
@@ -32,13 +32,14 @@ class Title(db.Model):
     query: sql.Select
 
     id = db.Column(db.Integer, primary_key=True)
-    users_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
+    users_id = db.Column(db.Integer, db.ForeignKey("users.user_id"))
     title = db.Column(db.String)
     time = db.Column(db.DateTime())
 
     def __repr__(self):
         return "<Title(id='{}', users_id='{}', title='{}', time='{}')>".format(
-            self.id, self.users_id, self.title, self.time)
+            self.id, self.users_id, self.title, self.time
+        )
 
 
 class Criteria(db.Model):
@@ -46,7 +47,7 @@ class Criteria(db.Model):
     query: sql.Select
 
     id = db.Column(db.Integer, primary_key=True)
-    users_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
+    users_id = db.Column(db.Integer, db.ForeignKey("users.user_id"))
     genre = db.Column(db.Integer)
     vote_average = db.Column(db.Integer)
     year = db.Column(db.Integer)
@@ -54,7 +55,8 @@ class Criteria(db.Model):
 
     def __repr__(self):
         return "<Title(id='{}', users_id='{}', genre='{}', vote_average='{}', year='{}', time='{}')>".format(
-            self.id, self.users_id, self.genre, self.vote_average, self.year, self.time)
+            self.id, self.users_id, self.genre, self.vote_average, self.year, self.time
+        )
 
 
 class MyMovies(db.Model):
@@ -62,16 +64,17 @@ class MyMovies(db.Model):
     query: sql.Select
 
     id = db.Column(db.Integer, primary_key=True)
-    users_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
+    users_id = db.Column(db.Integer, db.ForeignKey("users.user_id"))
     movie_id = db.Column(db.Integer)
     time = db.Column(db.DateTime())
     data = db.Column(db.Text)
 
-    __tableargs__ = (db.UniqueConstraint('users_id', 'movie_id'))
+    __tableargs__ = db.UniqueConstraint("users_id", "movie_id")
 
     def __repr__(self):
         return "<MyMovies(id='{}', users_id='{}', movie_id='{}', time='{}', data='{}')>".format(
-            self.id, self.users_id, self.movie_id, self.time, self.data)
+            self.id, self.users_id, self.movie_id, self.time, self.data
+        )
 
 
 class DBCommands:
@@ -118,20 +121,25 @@ class DBCommands:
 
     async def show_movies(self):
         user_id = types.User.get_current().id
-        my_movies = await MyMovies.query.where(MyMovies.users_id == user_id).order_by(desc(MyMovies.id)).gino.all()
+        my_movies = (
+            await MyMovies.query.where(MyMovies.users_id == user_id)
+            .order_by(desc(MyMovies.id))
+            .gino.all()
+        )
         return my_movies
-
 
     async def get_movie(self, movie_id):
         user_id = types.User.get_current().id
-        drop = await MyMovies.query.where(MyMovies.movie_id == movie_id and MyMovies.users_id == user_id).gino.first()
+        drop = await MyMovies.query.where(
+            MyMovies.movie_id == movie_id and MyMovies.users_id == user_id
+        ).gino.first()
         return drop
 
     ###########################
 
 
 async def create_db():
-    await db.set_bind(f'postgresql+asyncpg://{PG_USER}:{PG_PASS}@{PGHOST}/{DB_NAME}')
+    await db.set_bind(f"postgresql+asyncpg://{PG_USER}:{PG_PASS}@{PGHOST}/{DB_NAME}")
 
     # Create tables
     db.gino: GinoSchemaVisitor

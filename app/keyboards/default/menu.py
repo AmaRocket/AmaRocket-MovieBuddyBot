@@ -1,25 +1,24 @@
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, KeyboardButtonPollType
+from aiogram.types import KeyboardButton, KeyboardButtonPollType, ReplyKeyboardMarkup
 
 # =====================================================================================================================
 
 vote_average = ReplyKeyboardMarkup(
+    keyboard=[
+        [KeyboardButton(text=str(i)) for i in range(1, 10)],
+        [KeyboardButton(text="Cancel")],
+    ],
     resize_keyboard=True,
-    one_time_keyboard=True
+    one_time_keyboard=True,
 )
-for i in range(1, 10):
-    vote_average.insert(KeyboardButton(text=i))
-vote_average.add(KeyboardButton(text='Cancel'))
 
 # =====================================================================================================================
 
 totalkb = ReplyKeyboardMarkup(
     keyboard=[
-        [
-            KeyboardButton(text='Finish')
-        ],
+        [KeyboardButton(text="Finish")],
     ],
     resize_keyboard=True,
-    one_time_keyboard=True
+    one_time_keyboard=True,
 )
 
 # =====================================================================================================================

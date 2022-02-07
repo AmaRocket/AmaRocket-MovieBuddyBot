@@ -1,1 +1,1 @@
-from .menu import vote_average, totalkb
+from .menu import totalkb, vote_average
