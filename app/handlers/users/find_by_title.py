@@ -8,11 +8,12 @@ from aiogram.dispatcher.filters import Text
 from aiogram.types import ChatActions
 
 from database.db import DBCommands, Title
-from keyboards.inline.choise_buttons import menu_, title_keyboard, title_movie_buttons
-from loader import bot, dp
+from keyboards.inline.choise_buttons import (menu_, title_keyboard,
+                                             title_movie_buttons)
+from loader import _, bot, dp
 from message_output.message_output import MessageText
 from states.criteria import FormCriteria
-from tmdb_v3_api import TheMovie
+from tmdb_v3_api import get_api_for_context
 
 # ================ DATA BASE SETTINGS =================================================================================
 
@@ -31,10 +32,10 @@ async def choose_option(callback: types.CallbackQuery):
     """
     # For "typing" message in top console
     await bot.send_chat_action(callback.message.chat.id, ChatActions.TYPING)
-    await asyncio.sleep(0.5)
+    await asyncio.sleep(0.25)
 
     await FormCriteria.title.set()
-    await callback.message.answer("Enter Title Of Film:")
+    await callback.message.answer(_("Enter Title Of Film:"))
     await callback.answer()
 
 
@@ -65,7 +66,9 @@ async def find_by_title(message: types.Message, state: FSMContext):
         img = open("../media/futurama-fry-gif-wallpaper-futurama-1668529063.jpg", "rb")
         await bot.send_photo(message.chat.id, photo=img)
         await sleep(1)
-        await message.reply(text=item.title, reply_markup=title_keyboard())
+        await message.reply(
+            _("{item}").format(item=item.title), reply_markup=title_keyboard()
+        )
 
         await state.reset_state()
 
@@ -87,24 +90,32 @@ async def title(callback: types.CallbackQuery):
             i = index
 
         name = i.title
-        movie_list = TheMovie().movie.search(name)
+
+        tmdb_with_language = await get_api_for_context(callback.message.chat.id)
+
+        movie_list = tmdb_with_language.movie.search(name)
 
         message = MessageText(movie_list[first])
-        poster = "https://image.tmdb.org/t/p/original" + message.movie_image
+        if message.movie_image is None:
+            poster = "https://image.tmdb.org/t/p/original"
+        else:
+            poster = "https://image.tmdb.org/t/p/original" + message.movie_image
 
         # For "typing" message in top console
         await bot.send_chat_action(callback.message.chat.id, ChatActions.TYPING)
-        await asyncio.sleep(0.5)
+        await asyncio.sleep(0.25)
 
-        await callback.message.edit_text(text=f"{message.message} {poster}")
+        await callback.message.edit_text(
+            _("{message} {poster}").format(message=message.message, poster=poster)
+        )
         await callback.message.edit_reply_markup(
             reply_markup=title_movie_buttons(
                 first, len(movie_list), message.original_title, message.movie_id
             )
         )
     except IndexError:
-
-        await callback.message.reply(text="Sorry. No Results", reply_markup=menu_())
+        await callback.answer()
+        await callback.message.reply(_("Sorry. No Results"), reply_markup=menu_())
 
 
 # =====================================================================================================================

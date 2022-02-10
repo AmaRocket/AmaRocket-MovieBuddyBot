@@ -107,8 +107,6 @@ class DBCommands:
         user = await self.get_user(user_id)
         await user.update(language=language).apply()
 
-    ###########################
-
     async def show_title(self):
         user_id = types.User.get_current().id
         title = await Title.query.where(Title.users_id == user_id).gino.all()
@@ -135,7 +133,13 @@ class DBCommands:
         ).gino.first()
         return drop
 
-    ###########################
+    async def get_lang(self, user_id):
+        user_id = types.User.get_current().id
+        lang = User.language()
+        return lang
+
+
+# =====================================================================================================================
 
 
 async def create_db():

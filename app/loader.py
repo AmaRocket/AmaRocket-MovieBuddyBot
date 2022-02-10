@@ -17,6 +17,6 @@ logging.basicConfig(
     format="%(filename)s [LINE:%(lineno)d] #%(levelname)-8s [%(asctime)s]  %(message)s",
     level=logging.INFO,
 )
-#
-# i18n = setup_middleware(dp)
-# _ = i18n.gettext()
+
+i18n = setup_middleware(dp)
+_ = i18n.gettext

@@ -14,6 +14,6 @@ WORKDIR /usr/src/app/
 # copy project
 COPY . /usr/src/app/
 # install dependencies
-RUN pip install -r ./requirements.txt
+RUN pip install -r ../requirements.txt
 # run app
 CMD ["python", "app.py"]

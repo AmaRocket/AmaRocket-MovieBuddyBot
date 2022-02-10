@@ -1,17 +1,16 @@
 import asyncio
-import logging
 
 from aiogram import types
-from aiogram.dispatcher import FSMContext
-from aiogram.dispatcher.filters import Command, Text
+from aiogram.dispatcher.filters import CommandStart, Text
 from aiogram.types import ChatActions, Message
 
 from database.db import DBCommands
 from keyboards.inline.choise_buttons import menu_, start, starting
-from loader import bot, dp
-from states.criteria import FormCriteria
+from keyboards.inline.language import get_markup
+from loader import _, bot, dp
 
 # ================ DATA BASE SETTINGS =================================================================================
+
 
 db = DBCommands()
 
@@ -19,7 +18,7 @@ db = DBCommands()
 # =====================================================================================================================
 
 # ================ START FUNCTIONS + ADD USER TO DB ====================================================================
-@dp.message_handler(Command("start"))
+@dp.message_handler(CommandStart())
 async def start_menu(message: Message):
     """
 
@@ -29,33 +28,62 @@ async def start_menu(message: Message):
 
     username = message.from_user.first_name
 
-    # id = user.id  # For Change lang
-
     count_users = await db.count_users()  # Count users for admin (in future mb)
     print(count_users)
 
     # For "typing" message in top console
     await bot.send_chat_action(message.chat.id, ChatActions.TYPING)
-    await asyncio.sleep(1)
+    await asyncio.sleep(0.25)
 
     await db.add_new_user()  # add user in db
 
-    with open("../media/photo_2022-02-03_01-21-05.jpg", "rb") as img:
+    with open("../media/futurama-1644426466304-7977.jpg", "rb") as img:
         await bot.send_photo(
             message.chat.id,
             img,
-            caption=f"<b>Hello {username}!\nBuddy I Can Help U With:\n\n🔍 🔸 Find A Movie \n\n"
-            f"📝 🔸 Add It Your Movie List \n\n"
-            f"📺 🔸 Watch Trailer On YouTube  \n\nℹ 🔸 Watch Info On TMDB ️\n\n"
-            f"⚡ 🔸 And Yes! I Am Powered By TMDB󠁴</b>",
+            _("<b>Choose The Language {username}</b>").format(username=username),
+            reply_markup=get_markup(),
+        )
+
+
+@dp.callback_query_handler(text_contains="lang")
+async def change_language(callback: types.CallbackQuery):
+    username = callback.message.from_user.first_name
+    await callback.message.edit_reply_markup()
+    lang = callback.data[-2:]
+
+    # For "typing" message in top console
+    await bot.send_chat_action(callback.message.chat.id, ChatActions.TYPING)
+    await asyncio.sleep(0.25)
+
+    await db.set_language(lang)
+
+    await dp.middleware.trigger("set_language", {})
+
+    await callback.answer(_("Your Language Was Changed", locale=lang))
+    with open("../media/photo_2022-02-03_01-21-05.jpg", "rb") as img:
+        await bot.send_photo(
+            callback.message.chat.id,
+            img,
+            _(
+                "<b>Hey! I Am {username}\nBuddy I Can Help U With:\n\n🔍 🔸 Find A Movie \n\n"
+                "📝 🔸 Add It Your Movie List \n\n"
+                "📺 🔸 Watch Trailer On YouTube  \n\nℹ 🔸 Watch Info On TMDB ️\n\n"
+                "⚡ 🔸 And Yes! I Am Powered By TMDB󠁴</b>"
+            ).format(username=username),
             reply_markup=starting(),
         )
 
 
-@dp.callback_query_handler(Text(equals="go", ignore_case=True))
+@dp.callback_query_handler(Text(equals="go"))
 async def starter(callback: types.CallbackQuery):
+
+    # For "typing" message in top console
+    await bot.send_chat_action(callback.message.chat.id, ChatActions.TYPING)
+    await asyncio.sleep(0.25)
+
     await callback.message.reply(
-        "Find Movie Or Check Your Movie List 👇", reply_markup=start()
+        _("Find Movie Or Check Your Movie List 👇"), reply_markup=start()
     )
     await callback.answer()
 
@@ -74,43 +102,7 @@ async def movies(callback: types.CallbackQuery):
     """
     # For "typing" message in top console
     await bot.send_chat_action(callback.message.chat.id, ChatActions.TYPING)
-    await asyncio.sleep(0.5)
+    await asyncio.sleep(0.25)
 
-    await callback.message.reply("Choose The Option 👇", reply_markup=menu_())
+    await callback.message.reply(_("Choose The Option 👇"), reply_markup=menu_())
     await callback.answer()
-
-
-# ================ CANCEL CHOOSE ======================================================================================
-
-
-@dp.callback_query_handler(Text(startswith="finish"), state=FormCriteria)
-async def passing(callback: types.CallbackQuery, state: FSMContext):
-    await callback.message.reply("Select Your Option From Menu👇🏻", reply_markup=menu_())
-    await callback.answer(text="Thnx For Using This Bot 🤖!")
-    await state.finish()
-
-
-# You can use state '*' if you need to handle all states
-@dp.message_handler(state="*", commands="cancel")
-@dp.message_handler(Text(equals="cancel", ignore_case=True), state="*")
-async def cancel_handler(message: types.Message, state: FSMContext):
-    """
-    Allow user to cancel any action
-    """
-    current_state = await state.get_state()
-    if current_state is None:
-        return
-
-    logging.info("Cancelling state %r", current_state)
-
-    # For "typing" message in top console
-    await bot.send_chat_action(message.chat.id, ChatActions.TYPING)
-    await asyncio.sleep(0.5)
-
-    # Cancel state and inform user about it
-    await state.finish()
-    # And remove keyboard (just in case)
-    await message.reply("Cancelled.", reply_markup=types.ReplyKeyboardRemove())
-
-
-# =====================================================================================================================
