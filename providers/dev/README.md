@@ -12,8 +12,7 @@ repo contains the next components:
     Terraform modules
         Cluster - Creates a ECS Cluster and related services
         Codebuild - Creates an AWS Codebuild job which starts automatically when code pushed to "develop" branch
-        ECR - Creates an Elastic Container repository
-        Init-Build - Builds and deploys initial image to ECR when new repository is created
+        Init-Build - Creats variables  for cluster
 
 Configuration
 
@@ -59,10 +58,6 @@ One command deployment
 terragrunt run-all init
 
     Then...
-
-terragrunt run-all plan
-
-    And if there is no issues in generated plan:
 
 terragrunt run-all apply
 
