@@ -1,3 +1,10 @@
+Tools versions:
+
+    Terraform - 1.0.11
+    Terragrunt - 0.36.1
+    AWS Cli - 2.0.42
+
+
 repo contains the next components:
 
     Application itself
