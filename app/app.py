@@ -9,7 +9,7 @@ async def on_startup(_):
     await bot.send_message(ADMIN_ID, "I'm Work!")
 
 
-async def on_shutdown(p):
+async def on_shutdown(dp):
     await bot.close()
     await bot.send_message(ADMIN_ID, "I'm Down!")
 
