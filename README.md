@@ -23,6 +23,7 @@ Also, you can watch info on **TMDB** site, and watch trailers on **YouTube**.
 
 
 - Run **app.py** for using this Bot 
+- All application files in **~/app**
 - Install all requirements from **requirements.txt**
 - All configurations in file **config.py**
 - Tokens, DB-Info and Keys for **configurations** are stored in a file **.env**
