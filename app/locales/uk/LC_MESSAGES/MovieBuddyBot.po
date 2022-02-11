@@ -1,0 +1,401 @@
+# Ukrainian translations for PROJECT.
+# Copyright (C) 2022 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2022-02-11 03:34+0200\n"
+"PO-Revision-Date: 2022-02-09 20:04+0200\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: uk\n"
+"Language-Team: uk <LL@li.org>\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.1\n"
+
+#: handlers/mailing.py:15
+msgid "Send Your Mailing Text"
+msgstr "Надішліть Свій Текст"
+
+#: handlers/mailing.py:24
+msgid ""
+"What Is The Language Of Mailing? \n"
+"\n"
+"Text: \n"
+"{text}"
+msgstr ""
+"Яка Мова Розсилки? \n"
+"\n"
+"Текст: \n"
+"{text}"
+
+#: handlers/mailing.py:45
+msgid "Mailing Success"
+msgstr "Розсилка Пройшла Успішно"
+
+#: handlers/users/find_by_criteria.py:33
+msgid "Select Your Option From Menu👇🏻"
+msgstr "Віберіть Опцію 👇"
+
+#: handlers/users/find_by_criteria.py:35
+msgid "Thnx For Using This Bot 🤖!"
+msgstr "Дякую, Що Скористувались Цим Ботом 🤖!"
+
+#: handlers/users/find_by_criteria.py:59
+msgid "Cancelled."
+msgstr "Відхилено"
+
+#: handlers/users/find_by_criteria.py:77
+msgid "Choose Genre:"
+msgstr "Оберіть Жанр"
+
+#: handlers/users/find_by_criteria.py:99
+msgid "Enter Vote Average: "
+msgstr "Виберіть Рейтинг"
+
+#: handlers/users/find_by_criteria.py:110
+msgid ""
+"Vote average may be a number. \n"
+" Rate it! (digits only)"
+msgstr "Рейтинг Має Бути Числом. \n"
+
+#: handlers/users/find_by_criteria.py:139
+msgid "What is the Year?"
+msgstr "Який Рік?"
+
+#: handlers/users/find_by_criteria.py:149
+msgid ""
+"Year may be a number. \n"
+" Example: 1999 (digits only)"
+msgstr ""
+"Рік Має Бути Числом. \n"
+" Наприклад: 1999"
+
+#: handlers/users/find_by_criteria.py:184
+msgid ""
+"<b> Genre ID: </b>{genre}\n"
+"<b> Vote Average </b>{vote_average}\n"
+"<b> Year </b>{year}\n"
+msgstr ""
+"<b> ID : </b>{genre}\n"
+"<b> Рейтинг: </b>{vote_average}\n"
+"<b> Рік: </b>{year}\n"
+
+#: handlers/users/find_by_criteria.py:241
+msgid "{message.message} {poster}"
+msgstr ""
+
+#: handlers/users/find_by_criteria.py:249 handlers/users/find_by_title.py:118
+#: handlers/users/similar_movies.py:53
+msgid "Sorry. No Results"
+msgstr "Вибачте. Без Результатів"
+
+#: handlers/users/find_by_title.py:38
+msgid "Enter Title Of Film:"
+msgstr "Введіть Назву Фільму"
+
+#: handlers/users/find_by_title.py:70
+msgid "{item}"
+msgstr ""
+
+#: handlers/users/find_by_title.py:109 handlers/users/my_movies.py:65
+#: handlers/users/popular_movies.py:51 handlers/users/similar_movies.py:45
+msgid "{message} {poster}"
+msgstr ""
+
+#: handlers/users/menu.py:44
+msgid "<b>Choose The Language {username}</b>"
+msgstr "<b>Оберіть Мову {username}</b>"
+
+#: handlers/users/menu.py:63
+msgid "Your Language Was Changed"
+msgstr "Ваша Мова Була Змінена"
+
+#: handlers/users/menu.py:68
+msgid ""
+"<b>Hey! I Am {username}\n"
+"Buddy I Can Help U With:\n"
+"\n"
+"🔍 🔸 Find A Movie \n"
+"\n"
+"📝 🔸 Add It Your Movie List \n"
+"\n"
+"📺 🔸 Watch Trailer On YouTube  \n"
+"\n"
+"ℹ 🔸 Watch Info On TMDB ️\n"
+"\n"
+"⚡ 🔸 And Yes! I Am Powered By TMDB󠁴</b>"
+msgstr ""
+"<b>Привіт! Я {username}\n"
+"Друже, Я Допоможу Тобі:\n"
+"\n"
+"🔍 🔸 Знайти Фільм \n"
+"\n"
+"📝 🔸 Додати Фільм До Твого Списку Фільмів \n"
+"\n"
+"📺 🔸 Знайти Трейлер На YouTube  \n"
+"\n"
+"ℹ 🔸 Подивитись Інформацію На TMDB ️\n"
+"\n"
+"⚡ 🔸 І Так! Я працюю за допомогою TMDB󠁴</b>"
+
+#: handlers/users/menu.py:86
+msgid "Find Movie Or Check Your Movie List 👇"
+msgstr "Знайти Фільм Або Подивитись Свій Список Фільмів 👇"
+
+#: handlers/users/menu.py:107
+msgid "Choose The Option 👇"
+msgstr "Виберіть Опцію 👇"
+
+#: handlers/users/my_movies.py:73
+msgid "Your Movie List Is Empty"
+msgstr "Ваш Список Фільмів Порожній"
+
+#: handlers/users/my_movies.py:98
+msgid "Added To Your MovieList"
+msgstr "Додано До Вашого Списку Фільмів"
+
+#: handlers/users/my_movies.py:100
+msgid "This Movie Already In Your List"
+msgstr "Цей Фільм Вже У Вашому Списку Фільмів"
+
+#: handlers/users/my_movies.py:127
+msgid "Deleted From Your MovieList"
+msgstr "Видалено Із Вашого Списку Фільмів"
+
+#: keyboards/inline/choise_buttons.py:7
+msgid "🔥 Lets Go! 🔥"
+msgstr "🔥 Поїхали! 🔥"
+
+#: keyboards/inline/choise_buttons.py:15
+msgid "🎬 Find Movies"
+msgstr "🎬 Знайти Фільм"
+
+#: keyboards/inline/choise_buttons.py:17
+msgid "🍿 My Movie List"
+msgstr "🍿 Мій Список Фільмів"
+
+#: keyboards/inline/choise_buttons.py:30 keyboards/inline/choise_buttons.py:100
+#: keyboards/inline/choise_buttons.py:158
+#: keyboards/inline/choise_buttons.py:221
+#: keyboards/inline/choise_buttons.py:283
+msgid "📺 Trailer YouTube"
+msgstr "📺 Трейлер Youtube"
+
+#: keyboards/inline/choise_buttons.py:37 keyboards/inline/choise_buttons.py:107
+#: keyboards/inline/choise_buttons.py:165
+#: keyboards/inline/choise_buttons.py:228
+#: keyboards/inline/choise_buttons.py:290
+msgid "ℹ️ More Info On TMDB"
+msgstr "ℹ️Більше На TMDB"
+
+#: keyboards/inline/choise_buttons.py:58 keyboards/inline/choise_buttons.py:124
+#: keyboards/inline/choise_buttons.py:182
+#: keyboards/inline/choise_buttons.py:245
+#: keyboards/inline/choise_buttons.py:307
+#: keyboards/inline/choise_buttons.py:366
+msgid "↩️ Back To Search Movies"
+msgstr "↩️Назад До Пошуку Кіно"
+
+#: keyboards/inline/choise_buttons.py:63 keyboards/inline/choise_buttons.py:129
+#: keyboards/inline/choise_buttons.py:187
+#: keyboards/inline/choise_buttons.py:250
+#: keyboards/inline/choise_buttons.py:312
+msgid "Ⓜ️️ Back To Menu"
+msgstr "Ⓜ️ Назад До Меню"
+
+#: keyboards/inline/choise_buttons.py:68
+msgid "🗑 Delete From Movie List"
+msgstr "🗑 Видалити Із Списку"
+
+#: keyboards/inline/choise_buttons.py:74 keyboards/inline/choise_buttons.py:140
+#: keyboards/inline/choise_buttons.py:198
+#: keyboards/inline/choise_buttons.py:261
+#: keyboards/inline/choise_buttons.py:323
+msgid "🎱 Movie Like This"
+msgstr "🎱 Схоже Кіно"
+
+#: keyboards/inline/choise_buttons.py:85
+msgid "🔍 Popular List"
+msgstr "🔍 Поулярне Кіно"
+
+#: keyboards/inline/choise_buttons.py:86
+msgid "🔍 By Title"
+msgstr "🔍 За Назвою"
+
+#: keyboards/inline/choise_buttons.py:87
+msgid "🔍 By Criteria"
+msgstr "🔍 За Критерієм"
+
+#: keyboards/inline/choise_buttons.py:88
+msgid "Ⓜ Back To Menu"
+msgstr "Ⓜ Назад До Меню"
+
+#: keyboards/inline/choise_buttons.py:134
+#: keyboards/inline/choise_buttons.py:192
+#: keyboards/inline/choise_buttons.py:255
+#: keyboards/inline/choise_buttons.py:317
+msgid "📝 Add To Movie List"
+msgstr "📝 Додати До Списку"
+
+#: keyboards/inline/choise_buttons.py:209
+#: keyboards/inline/choise_buttons.py:272
+msgid "Find"
+msgstr "Знайти"
+
+#: keyboards/inline/choise_buttons.py:337
+msgid "Action"
+msgstr "Екшен"
+
+#: keyboards/inline/choise_buttons.py:338
+msgid "Adventure"
+msgstr "Пригоди"
+
+#: keyboards/inline/choise_buttons.py:339
+msgid "Animation"
+msgstr "Анімаційні"
+
+#: keyboards/inline/choise_buttons.py:340
+msgid "Comedy"
+msgstr "Комедії"
+
+#: keyboards/inline/choise_buttons.py:341
+msgid "Crime"
+msgstr "Кримінал"
+
+#: keyboards/inline/choise_buttons.py:343
+msgid "Documentary"
+msgstr "Документальне"
+
+#: keyboards/inline/choise_buttons.py:345
+msgid "Drama"
+msgstr "Драма"
+
+#: keyboards/inline/choise_buttons.py:346
+msgid "Family"
+msgstr "Сімейне"
+
+#: keyboards/inline/choise_buttons.py:347
+msgid "Fantasy"
+msgstr "Фентезі"
+
+#: keyboards/inline/choise_buttons.py:348
+msgid "History"
+msgstr "Історичні"
+
+#: keyboards/inline/choise_buttons.py:349
+msgid "Horror"
+msgstr "Хоррор"
+
+#: keyboards/inline/choise_buttons.py:350
+msgid "Music"
+msgstr "Музика"
+
+#: keyboards/inline/choise_buttons.py:351
+msgid "Mystery"
+msgstr "Містика"
+
+#: keyboards/inline/choise_buttons.py:352
+msgid "Romance"
+msgstr "Романтика"
+
+#: keyboards/inline/choise_buttons.py:354
+msgid "Science Fiction"
+msgstr "Фантастика"
+
+#: keyboards/inline/choise_buttons.py:357
+msgid "TV Movie"
+msgstr "ТВ Шоу"
+
+#: keyboards/inline/choise_buttons.py:359
+msgid "Thriller"
+msgstr "Триллер"
+
+#: keyboards/inline/choise_buttons.py:360
+msgid "War"
+msgstr "Віскові"
+
+#: keyboards/inline/choise_buttons.py:361
+msgid "Western"
+msgstr "Вестерн"
+
+#: keyboards/inline/language.py:9
+msgid "Russian"
+msgstr "Російська"
+
+#: keyboards/inline/language.py:10
+msgid "English"
+msgstr "Англійська"
+
+#: keyboards/inline/language.py:11
+msgid "Ukraine"
+msgstr "Україньска"
+
+#: message_output/message_output.py:18
+msgid "<b>#️⃣ ID: </b>"
+msgstr ""
+
+#: message_output/message_output.py:19
+msgid "<b>🎞 Movie: </b>"
+msgstr "🎞 Назва: "
+
+#: message_output/message_output.py:20
+msgid "<b>📅 Release date: </b>"
+msgstr "<b>📅 Дата Випуску: </b>"
+
+#: message_output/message_output.py:21
+msgid "<b>🌐 Original language: </b>"
+msgstr "<b>🌐 Оригінальна Мова: </b>"
+
+#: message_output/message_output.py:22
+msgid "<b>💎 Voteaverage: </b>"
+msgstr "<b>💎 Рейтинг: </b>"
+
+#: message_output/message_output.py:23
+msgid "<b>🔄 Vote count: </b>"
+msgstr "<b>🔄 Кількість Проголосувавших: </b>"
+
+#: message_output/message_output.py:24
+msgid "<b>🍿 Popularity: </b>"
+msgstr "<b>🍿 Популярність: </b>"
+
+#: message_output/message_output.py:25
+msgid "<b>📜 Overwiew: </b>"
+msgstr "<b>📜 Огляд: </b>"
+
+#~ msgid "{text}"
+#~ msgstr ""
+
+#~ msgid "<b>#️⃣ ID:</b>"
+#~ msgstr ""
+
+#~ msgid "<b>🎞 Movie: </b>"
+#~ msgstr "<b>🎞 Назва: </b>"
+
+#~ msgid "📅 Release date: "
+#~ msgstr "<b>📅 Дата Випуску: </b>"
+
+#~ msgid "🌐 Original language: "
+#~ msgstr "<b>🌐 Оригінальна Мова: </b>"
+
+#~ msgid "💎 Voteaverage: "
+#~ msgstr "<b>💎 Рейтинг: </b>"
+
+#~ msgid "🔄 Vote count: "
+#~ msgstr "<b>🔄 Кількість Проголосувавших: </b>"
+
+#~ msgid "🍿 Popularity: "
+#~ msgstr "<b>🍿 Популярність: </b>"
+
+#~ msgid "📜 Overwiew: "
+#~ msgstr "<b>📜 Огляд: </b>"
+
+#~ msgid "#️⃣ ID: "
+#~ msgstr ""
+
