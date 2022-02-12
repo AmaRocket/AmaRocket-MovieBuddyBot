@@ -67,7 +67,7 @@ class MyMovies(db.Model):
     users_id = db.Column(db.Integer, db.ForeignKey("users.user_id"))
     movie_id = db.Column(db.Integer)
     time = db.Column(db.DateTime())
-    data = db.Column(db.Text)
+
 
     __tableargs__ = db.UniqueConstraint("users_id", "movie_id")
 
